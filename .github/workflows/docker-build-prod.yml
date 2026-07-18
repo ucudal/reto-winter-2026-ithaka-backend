@@ -1,0 +1,118 @@
+name: Docker build and security
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: ithaka-backend
+  LOCAL_IMAGE: ithaka-backend:${{ github.sha }}
+
+jobs:
+  secret-scan:
+    name: Gitleaks secret scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Scan repository for secrets
+        uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+  build-scan-push:
+    name: Build, Trivy scan and Azure push
+    runs-on: ubuntu-latest
+    needs:
+      - secret-scan
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          target: runtime
+          load: true
+          push: false
+          tags: ${{ env.LOCAL_IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Show built Docker image
+        run: |
+          docker image ls
+          docker image inspect "${LOCAL_IMAGE}"
+
+      - name: Scan image with Trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.LOCAL_IMAGE }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+      - name: Login to Azure Container Registry
+        if: >-
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ vars.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Tag and push image to Azure
+        if: >-
+          github.event_name == 'push' &&
+          github.ref == 'refs/heads/main'
+        env:
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+        run: |
+          set -euo pipefail
+
+          ACR_IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_NAME}"
+
+          echo "Tagging image as:"
+          echo "${ACR_IMAGE}:${GITHUB_SHA}"
+          echo "${ACR_IMAGE}:latest"
+
+          docker tag \
+            "${LOCAL_IMAGE}" \
+            "${ACR_IMAGE}:${GITHUB_SHA}"
+
+          docker tag \
+            "${LOCAL_IMAGE}" \
+            "${ACR_IMAGE}:latest"
+
+          docker push "${ACR_IMAGE}:${GITHUB_SHA}"
+          docker push "${ACR_IMAGE}:latest"
+
+      - name: Build completed without push
+        if: >-
+          !(
+            github.event_name == 'push' &&
+            github.ref == 'refs/heads/main'
+          )
+        run: |
+          echo "Image built and scanned successfully."
+          echo "No push was performed because this is not a push to the default branch."
