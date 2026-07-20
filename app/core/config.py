@@ -1,27 +1,8 @@
-from functools import lru_cache
+import os
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
 
+load_dotenv()
 
-class Settings(BaseSettings):
-
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
-
-    DATABASE_URL: str = (
-        "postgresql+psycopg://ithaka:ithaka@localhost:5432/ithaka"
-    )
-    SECRET_KEY: str = "changeme"
-
-    DB_ECHO: bool = False
-
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-
-
-settings = get_settings()
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+SECRET_KEY = os.getenv("SECRET_KEY", "")
