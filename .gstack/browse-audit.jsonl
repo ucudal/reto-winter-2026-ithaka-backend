@@ -1,0 +1,7 @@
+{"ts":"2026-07-20T16:58:10.260Z","cmd":"goto","args":"http://localhost:5174/","origin":"http://localhost:5174/","durationMs":1860,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-07-20T16:58:15.004Z","cmd":"console","args":"--errors","origin":"http://localhost:5174/login","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-07-20T16:58:19.302Z","cmd":"text","args":"","origin":"http://localhost:5174/login","durationMs":45,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-07-20T16:58:37.942Z","cmd":"js","args":"import('/src/api/endpoints/health.js').then(m => m.getHealth()).then(r => 'OK ' + JSON.stringify(r)).catch(e => 'ERR ' + (e.message || String(e)))","origin":"http://localhost:5174/login","durationMs":5399,"status":"error","hasCookies":false,"mode":"launched","error":"page.evaluate: Execution context was destroyed, most likely because of a navigation."}
+{"ts":"2026-07-20T16:58:46.331Z","cmd":"wait","args":"--networkidle","origin":"http://localhost:5174/login","durationMs":11,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-07-20T16:58:46.836Z","cmd":"js","args":"import('/src/api/endpoints/health.js').then(m => m.getHealth()).then(r => 'OK ' + JSON.stringify(r)).catch(e => 'ERR ' + (e.message || String(e)))","origin":"http://localhost:5174/login","durationMs":279,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-07-20T16:58:56.005Z","cmd":"network","args":"","origin":"http://localhost:5174/login","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}

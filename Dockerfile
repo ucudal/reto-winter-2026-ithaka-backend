@@ -38,6 +38,10 @@ RUN pip install --no-index --find-links=/wheels -r requirements.txt && \
 # Copiar el código: queda /app/app/main.py => `app.main:app` resuelve (cwd /app en sys.path).
 COPY --chown=appuser:appgroup app/ ./app/
 
+# Copiar migraciones Alembic
+COPY --chown=appuser:appgroup alembic/ ./alembic/
+COPY --chown=appuser:appgroup alembic.ini .
+
 USER appuser
 
 EXPOSE 8000
