@@ -18,10 +18,9 @@ class Meeting(Base):
         ForeignKey("tutors.id", ondelete="CASCADE"), nullable=False
     )
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    # Lista de nombres: ["Ana Fernández", "Luca Rossi", ...]
-    participants: Mapped[list[str] | None] = mapped_column(JSONB, nullable=True)
-    topics_discussed: Mapped[str | None] = mapped_column(Text, nullable=True)
-    agreements: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Lista de IDs de participantes: [101, 102, ...]
+    participants: Mapped[list[int] | None] = mapped_column(JSONB, nullable=True)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     next_steps: Mapped[str | None] = mapped_column(Text, nullable=True)
     hours_spent: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
     # Lista de links: [{"type": "Drive", "url": "..."}]
