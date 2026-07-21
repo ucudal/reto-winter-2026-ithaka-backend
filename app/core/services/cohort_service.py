@@ -25,8 +25,13 @@ class CohortService:
         cohort = self._get_or_404(db, cohort_id)
         return self._to_read(db, cohort)
 
-    def upsert_cohort(self, db: Session, cohort_id: int, payload: CohortUpsertRequest) -> CohortRead:
-        cohort = self.repository.upsert(db, cohort_id, payload)
+    def upsert_cohort(self, db: Session, payload: CohortUpsertRequest) -> CohortRead:
+        if payload.id is None:
+            cohort = self.repository.create(db, payload)
+        else:
+            cohort = self._get_or_404(db, payload.id)
+            cohort = self.repository.update(db, cohort, payload)
+
         return self._to_read(db, cohort)
 
     def list_groups(self, db: Session, cohort_id: int) -> list[CohortGroupRead]:

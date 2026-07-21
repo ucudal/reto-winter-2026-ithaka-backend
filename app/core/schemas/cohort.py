@@ -15,7 +15,7 @@ class CohortBase(BaseModel):
 
 
 class CohortUpsertRequest(CohortBase):
-    pass
+    id: int | None = None
 
 
 class CohortRead(CohortBase):

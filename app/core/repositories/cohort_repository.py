@@ -20,16 +20,18 @@ class CohortRepository:
     def get_by_id(self, db: Session, cohort_id: int) -> Cohort | None:
         return db.get(Cohort, cohort_id)
 
-    def upsert(self, db: Session, cohort_id: int, payload: CohortUpsertRequest) -> Cohort:
-        cohort = self.get_by_id(db, cohort_id)
-        if cohort is None:
-            cohort = Cohort(id=cohort_id, **payload.model_dump())
-            db.add(cohort)
-            db.flush()
-            self._sync_id_sequence(db)
-        else:
-            for field, value in payload.model_dump().items():
-                setattr(cohort, field, value)
+    def create(self, db: Session, payload: CohortUpsertRequest) -> Cohort:
+        cohort = Cohort(**payload.model_dump(exclude={"id"}))
+        db.add(cohort)
+        db.flush()
+        self._sync_id_sequence(db)
+        db.commit()
+        db.refresh(cohort)
+        return cohort
+
+    def update(self, db: Session, cohort: Cohort, payload: CohortUpsertRequest) -> Cohort:
+        for field, value in payload.model_dump(exclude={"id"}).items():
+            setattr(cohort, field, value)
 
         db.commit()
         db.refresh(cohort)

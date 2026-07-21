@@ -32,14 +32,13 @@ def get_cohort(
     return service.get_cohort(db, cohort_id)
 
 
-@router.put("/{cohort_id}", response_model=CohortRead)
+@router.put("", response_model=CohortRead)
 def upsert_cohort(
-    cohort_id: int,
     payload: CohortUpsertRequest,
     db: Session = Depends(get_db),
     service: CohortService = Depends(get_cohort_service),
 ):
-    return service.upsert_cohort(db, cohort_id, payload)
+    return service.upsert_cohort(db, payload)
 
 
 @router.get("/{cohort_id}/groups", response_model=list[CohortGroupRead])
