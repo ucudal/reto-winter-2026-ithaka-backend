@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
-from app.api.stages import router as stages_router
+from app.api.stage_api import router as stages_router
 
 app = FastAPI(
     title="Ithaka Backend",

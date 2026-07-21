@@ -1,5 +1,7 @@
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.db.session import get_db
 from app.core.models.deliverable import Deliverable
 from app.core.models.stage import Stage
 from app.core.repositories.stage_repository import StageRepository
@@ -19,5 +21,9 @@ class StageService:
     def get_expected_deliverables(self, stage_id: int) -> list[Deliverable] | None:
         stage = self.repository.get_by_id(stage_id)
         if stage is None:
-            return None
+            raise HTTPException (status_code=404,detail="Etapa invalida.") 
         return self.repository.get_expected_deliverables(stage_id)
+
+
+def get_stage_service(db: Session = Depends(get_db)) -> StageService:
+    return StageService(db)
