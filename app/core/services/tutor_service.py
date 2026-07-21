@@ -1,6 +1,5 @@
 from sqlalchemy import false
 
-
 class TutorService:
     
     def list_tutors(self):
@@ -26,7 +25,6 @@ class TutorService:
             "max_capacity": 88,
             "status": "Active",
         }
-        
         
     def get_tutor_capacity(self, tutor_id: int):
         return {
