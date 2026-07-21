@@ -1,7 +1,6 @@
-#Si se agrega un modelo hay que agragarlo aca
+# Si se agrega un modelo hay que agregarlo acá
 
 from app.core.db.base import Base
-from app.core.models.assignment import Assignment
 from app.core.models.cohort import Cohort
 from app.core.models.comment import Comment
 from app.core.models.deliverable import Deliverable
@@ -16,7 +15,6 @@ from app.core.models.user import User
 
 __all__ = [
     "Base",
-    "Assignment",
     "Cohort",
     "Comment",
     "Deliverable",
