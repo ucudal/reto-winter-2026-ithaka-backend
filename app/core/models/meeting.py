@@ -14,11 +14,10 @@ class Meeting(Base):
     group_id: Mapped[int] = mapped_column(
         ForeignKey("groups.id", ondelete="CASCADE"), nullable=False
     )
-    tutor_id: Mapped[int] = mapped_column(
-        ForeignKey("tutors.id", ondelete="CASCADE"), nullable=False
-    )
+    # Lista de IDs de tutores: [8, 14, ...] — una reunión puede tener uno o más tutores
+    tutor_ids: Mapped[list[int] | None] = mapped_column(JSONB, nullable=True)
     date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
-    # Lista de IDs de participantes: [101, 102, ...]
+    # Lista de IDs de participantes (students): [101, 102, ...]
     participants: Mapped[list[int] | None] = mapped_column(JSONB, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     next_steps: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -27,4 +26,3 @@ class Meeting(Base):
     links: Mapped[list[dict] | None] = mapped_column(JSONB, nullable=True)
 
     group: Mapped["Group"] = relationship(back_populates="meetings")
-    tutor: Mapped["Tutor"] = relationship(back_populates="meetings")

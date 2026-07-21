@@ -1,4 +1,4 @@
-#Si se agrega un modelo hay que agragarlo aca
+# Si se agrega un modelo hay que agregarlo acá
 
 from app.core.db.base import Base
 from app.core.models.cohort import Cohort
