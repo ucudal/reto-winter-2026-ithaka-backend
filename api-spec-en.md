@@ -54,7 +54,6 @@
 ```
 # Cohorts
 GET    /api/cohorts
-POST   /api/cohorts
 GET    /api/cohorts/{id}
 PUT    /api/cohorts/{id}
 GET    /api/cohorts/{id}/groups
@@ -62,28 +61,23 @@ GET    /api/cohorts/{id}/stages
 
 # Groups
 GET    /api/groups
-POST   /api/groups
 GET    /api/groups/{id}
 PUT    /api/groups/{id}
 DELETE /api/groups/{id}
 GET    /api/groups/{id}/students
 GET    /api/groups/{id}/meetings
 GET    /api/groups/{id}/deliverables
-PATCH  /api/groups/{id}/stage
-PATCH  /api/groups/{id}/tutors
 GET    /api/groups/{id}/documents
-POST   /api/groups/{id}/documents
+PUT   /api/groups/{id}/documents
 
 # Students
 GET    /api/students
-POST   /api/students
 GET    /api/students/{id}
 PUT    /api/students/{id}
 DELETE /api/students/{id}
 
 # Tutors
 GET    /api/tutors
-POST   /api/tutors
 GET    /api/tutors/{id}
 PUT    /api/tutors/{id}
 GET    /api/tutors/{id}/groups
@@ -92,15 +86,13 @@ GET    /api/tutors/overloaded
 
 # Stages
 GET    /api/cohorts/{cohortId}/stages
-POST   /api/cohorts/{cohortId}/stages
+PUT   /api/cohorts/{cohortId}/stages
 GET    /api/stages/{id}
-PUT    /api/stages/{id}
 GET    /api/stages/{id}/deliverables
 GET    /api/stages/{id}/materials
 
 # Meetings
 GET    /api/meetings
-POST   /api/meetings
 GET    /api/meetings/{id}
 PUT    /api/meetings/{id}
 DELETE /api/meetings/{id}
@@ -108,18 +100,16 @@ GET    /api/groups/{groupId}/meetings/total-hours
 
 # Deliverables
 GET    /api/deliverables
-POST   /api/deliverables
 GET    /api/deliverables/{id}
 PUT    /api/deliverables/{id}
-PATCH  /api/deliverables/{id}/status
 GET    /api/deliverables/pending
 GET    /api/deliverables/overdue
 
 # Documents (polimórfico: hoy soporta Group y Deliverable como entity_type)
 GET    /api/deliverables/{deliverableId}/documents
-POST   /api/deliverables/{deliverableId}/documents
+PUT   /api/deliverables/{deliverableId}/documents
 GET    /api/groups/{id}/documents
-POST   /api/groups/{id}/documents
+PUT   /api/groups/{id}/documents
 DELETE /api/documents/{id}
 
 # Comments
@@ -129,7 +119,6 @@ DELETE /api/comments/{id}
 
 # Support Materials
 GET    /api/materials
-POST   /api/materials
 GET    /api/materials/{id}
 PUT    /api/materials/{id}
 DELETE /api/materials/{id}
@@ -162,7 +151,7 @@ POST   /api/users
   "group_count": 12
 }
 
-// POST /api/cohorts (request)
+// PUT /api/cohorts/{id} (request)
 {
   "year": 2026,
   "semester": 1,
@@ -198,25 +187,13 @@ POST   /api/users
   ]
 }
 
-// POST /api/groups (request)
+// PUT /api/groups/{id} (request)
 {
   "name": "EcoRoute",
   "cohort_id": 1,
   "idea": "Recycling route platform for companies",
   "student_ids": [101, 102],
   "current_stage_id": 2,
-  "business_tutor_id": 8,
-  "technical_tutor_id": 14
-}
-
-// PATCH /api/groups/{id}/stage (request)
-{
-  "stage_id": 3
-}
-
-// PATCH /api/groups/{id}/tutors (request)
-// Cualquiera de los dos campos es opcional — se puede actualizar uno solo.
-{
   "business_tutor_id": 8,
   "technical_tutor_id": 14
 }
@@ -233,7 +210,7 @@ POST   /api/users
   "group_id": 45
 }
 
-// POST /api/students (request)
+// PUT /api/students/{id} (request)
 {
   "name": "Ana Fernández",
   "email": "ana.fernandez@ucu.edu.uy",
@@ -293,7 +270,7 @@ POST   /api/users
 
 ### Meeting
 ```json
-// POST /api/meetings (request)
+// PUT /api/meetings/{id} (request)
 {
   "group_id": 45,
   "tutor_ids": [8, 14],
@@ -333,22 +310,18 @@ POST   /api/users
   ]
 }
 
-// POST /api/deliverables (request)
+// PUT /api/deliverables/{id} (request)
 {
   "group_id": 45,
   "stage_id": 2,
-  "expected_date": "2026-04-20"
-}
-
-// PATCH /api/deliverables/{id}/status (request)
-{
+  "expected_date": "2026-04-20",
   "status": "Under review"
 }
 ```
 
 ### Document
 ```json
-// POST /api/deliverables/{deliverableId}/documents (request)
+// PUT /api/deliverables/{deliverableId}/documents (request)
 // El endpoint sigue siendo específico por entidad (más simple de usar desde el
 // frontend), pero internamente guarda entity_type="Deliverable" y entity_id={deliverableId}.
 {
@@ -362,7 +335,7 @@ POST   /api/users
   { "id": 30, "entity_type": "Deliverable", "entity_id": 5, "url": "https://drive.google.com/ecoroute-doc", "platform": "Drive", "order": 1 }
 ]
 
-// POST /api/groups/{groupId}/documents (request) — mismo patrón, ahora disponible también para Group
+// PUT /api/groups/{id}/documents (request) — mismo patrón, ahora disponible también para Group
 {
   "url": "https://drive.google.com/ecoroute-repo",
   "platform": "Drive",
@@ -391,7 +364,7 @@ POST   /api/users
   { "id": 12, "stage_id": 2, "title": "Business Model Canvas Template", "url": "https://drive.google.com/bmc-template" }
 ]
 
-// POST /api/materials (request)
+// PUT /api/materials/{id} (request)
 {
   "stage_id": 2,
   "title": "Business Model Canvas Template",
