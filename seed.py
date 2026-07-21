@@ -7,8 +7,8 @@ from app.core.models.enums import UserRole
 from app.core.models.user import User
 from app.core.security import hash_password
 
-EMAIL = "coord@ucu.edu.uy"
-PASSWORD = "coord1234"
+EMAIL = "Pedro@ucu.edu.uy"
+PASSWORD = "Pedro1234"
 
 
 def main() -> None:
@@ -20,7 +20,7 @@ def main() -> None:
             return
         db.add(
             User(
-                name="Coordinador",
+                name="Coordinador Ithaka",
                 email=EMAIL,
                 role=UserRole.COORDINATOR,
                 password_hash=hash_password(PASSWORD),
