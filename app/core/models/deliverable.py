@@ -21,9 +21,7 @@ class Deliverable(Base):
 
     group: Mapped["Group"] = relationship(back_populates="deliverables")
     stage: Mapped["Stage"] = relationship(back_populates="deliverables")
-    documents: Mapped[list["Document"]] = relationship(
-        back_populates="deliverable", cascade="all, delete-orphan"
-    )
+    # documents se resuelven vía Document.entity_type='Deliverable' + entity_id (polimórfico)
     comments: Mapped[list["Comment"]] = relationship(
         back_populates="deliverable", cascade="all, delete-orphan"
     )
