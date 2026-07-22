@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import InvalidTokenError
 from sqlalchemy.orm import Session
 
@@ -19,9 +19,9 @@ from app.core.models.enums import UserRole
 from app.core.models.user import User
 from app.core.repositories.user_repository import UserRepository
 
-# tokenUrl debe coincidir con el endpoint de login para que el boton
-# "Authorize" de /docs funcione.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+# auto_error=False para poder devolver 401 (y no el 403 por defecto)
+# cuando falta el header Authorization.
+bearer_scheme = HTTPBearer(auto_error=False)
 
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -59,12 +59,16 @@ def create_access_token(
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> User:
     """Dependencia de FastAPI: resuelve el usuario autenticado desde el token."""
+    if credentials is None:
+        raise credentials_exception
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM]
+        )
         subject = payload.get("sub")
         if subject is None:
             raise credentials_exception

@@ -29,10 +29,10 @@ class AuthService:
             )
         return user
 
-    def login(self, email: str, password: str) -> str:
-        """Autentica y devuelve un token de acceso firmado."""
+    def login(self, email: str, password: str) -> tuple[User, str]:
+        """Autentica y devuelve el usuario junto con un token firmado."""
         user = self.authenticate(email, password)
-        return create_access_token(subject=str(user.id))
+        return user, create_access_token(subject=str(user.id))
 
     def create_user(self, data: UserCreate) -> User:
         if self.repository.get_by_email(data.email) is not None:
