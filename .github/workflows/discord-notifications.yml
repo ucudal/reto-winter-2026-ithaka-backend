@@ -1,8 +1,6 @@
 name: Discord notifications
 
 on:
-  pull_request_target:
-    types: [opened]
   issues:
     types: [opened, closed]
 
@@ -13,23 +11,21 @@ jobs:
   notify-discord:
     runs-on: ubuntu-latest
     steps:
-      - name: Send filtered notification
+      - name: Send filtered issue notification
         env:
-          EVENT_NAME: ${{ github.event_name }}
           ACTION: ${{ github.event.action }}
           REPOSITORY: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
-          NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
-          TITLE: ${{ github.event.pull_request.title || github.event.issue.title }}
-          HTML_URL: ${{ github.event.pull_request.html_url || github.event.issue.html_url }}
-          DISCORD_WEBHOOK_URL: ${{ github.event_name == 'pull_request_target' && secrets.DISCORD_PR_WEBHOOK_URL || secrets.DISCORD_ISSUE_WEBHOOK_URL }}
+          NUMBER: ${{ github.event.issue.number }}
+          TITLE: ${{ github.event.issue.title }}
+          HTML_URL: ${{ github.event.issue.html_url }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_ISSUE_WEBHOOK_URL }}
         run: |
           python3 - <<'PY'
           import json
           import os
           import urllib.request
 
-          event = os.environ["EVENT_NAME"]
           action = os.environ["ACTION"]
           repository = os.environ["REPOSITORY"]
           number = os.environ["NUMBER"]
@@ -38,18 +34,10 @@ jobs:
           actor = os.environ["ACTOR"]
           webhook_url = os.environ.get("DISCORD_WEBHOOK_URL", "")
           if not webhook_url:
-              raise SystemExit("Discord webhook secret is not configured")
+              raise SystemExit("Discord issue webhook secret is not configured")
 
-          if event == "pull_request_target":
-              heading = "🔀 Nuevo pull request"
-              color = 0x5865F2
-          elif action == "opened":
-              heading = "🆕 Nuevo issue"
-              color = 0x57F287
-          else:
-              heading = "✅ Issue cerrado"
-              color = 0x95A5A6
-
+          heading = "🆕 Nuevo issue" if action == "opened" else "✅ Issue cerrado"
+          color = 0x57F287 if action == "opened" else 0x95A5A6
           payload = {
               "username": "GitHub Reto",
               "allowed_mentions": {"parse": []},
