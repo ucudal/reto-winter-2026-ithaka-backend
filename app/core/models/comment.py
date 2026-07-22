@@ -5,7 +5,7 @@ from app.core.db.base import Base
 
 
 class Comment(Base):
-    #Comentario en un entregable
+    # Comentario de un tutor en un entregable
 
     __tablename__ = "comments"
 
@@ -20,4 +20,3 @@ class Comment(Base):
 
     tutor: Mapped["Tutor"] = relationship(back_populates="comments")
     deliverable: Mapped["Deliverable"] = relationship(back_populates="comments")
-    
