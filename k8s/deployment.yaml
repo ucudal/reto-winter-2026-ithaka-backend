@@ -17,9 +17,19 @@ spec:
     spec:
       imagePullSecrets:
         - name: acr-secret
+      initContainers:
+        - name: migrate
+          image: crretoxmas2024.azurecr.io/ithaka-backend:test-7261d1a
+          imagePullPolicy: IfNotPresent
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - configMapRef:
+                name: ithaka-backend-config
+            - secretRef:
+                name: ithaka-backend-secrets
       containers:
         - name: backend
-          image: crretoxmas2024.azurecr.io/ithaka-backend:test-92a0ac3
+          image: crretoxmas2024.azurecr.io/ithaka-backend:test-7261d1a
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
