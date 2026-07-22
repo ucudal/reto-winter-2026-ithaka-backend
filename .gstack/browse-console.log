@@ -1,0 +1,8 @@
+[2026-07-20T16:58:10.041Z] [debug] [vite] connecting...
+[2026-07-20T16:58:10.127Z] [info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-07-20T16:58:10.307Z] [warning] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+[2026-07-20T16:58:10.320Z] [debug] [vite] connected.
+[2026-07-20T16:58:38.292Z] [debug] [vite] connecting...
+[2026-07-20T16:58:38.336Z] [debug] [vite] connected.
+[2026-07-20T16:58:38.623Z] [info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[2026-07-20T16:58:38.683Z] [warning] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
