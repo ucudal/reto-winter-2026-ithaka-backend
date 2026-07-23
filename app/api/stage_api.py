@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 
 from app.core.schemas.stage import ExpectedDeliverableRead, StageRead, StageUpsert
 from app.core.services.stage_service import StageService, get_stage_service
@@ -11,9 +11,9 @@ def list_stages(service: StageService = Depends(get_stage_service)):
     return service.get_all()
 
 
-@router.put("/{stage_id}", response_model=StageRead)
-def upsert_stage(stage_id: int, data: StageUpsert, service: StageService = Depends(get_stage_service)):
-    return service.upsert(stage_id, data)
+@router.put("", response_model=StageRead)
+def upsert_stage(data: StageUpsert, service: StageService = Depends(get_stage_service)):
+    return service.upsert(data)
 
 
 @router.get("/{stage_id}/expected-deliverables", response_model=list[ExpectedDeliverableRead])

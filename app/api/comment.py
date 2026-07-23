@@ -11,7 +11,6 @@ class CommentRead(BaseModel):
     deliverable_id: int
     content: str
 
-
 class CommentCreateRequest(BaseModel):
     tutor_id: int
     deliverable_id: int
