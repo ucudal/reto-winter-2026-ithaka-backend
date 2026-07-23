@@ -8,14 +8,10 @@ class StudentBase(BaseModel):
     group_id: int | None = None 
 
 
-class StudentCreate(StudentBase):
-    pass
-
-
 class StudentUpdate(StudentBase):
-    pass
+    id: int | None = None
 
 
 class StudentRead(StudentBase):
     id: int
-    model_config = ConfigDict(from_attributes=True) 
+    model_config = ConfigDict(from_attributes=True)

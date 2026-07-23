@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.core.db.session import get_db
-from app.core.schemas.student import StudentCreate, StudentUpdate, StudentRead
+from app.core.schemas.student import StudentUpdate, StudentRead
 from app.core.services.student_service import StudentService
 
 router = APIRouter(prefix="/api/students", tags=["Students"])
@@ -10,11 +10,6 @@ router = APIRouter(prefix="/api/students", tags=["Students"])
 @router.get("", response_model=list[StudentRead])
 def list_students(db: Session = Depends(get_db)):
     return StudentService(db).list_students()
-
-
-@router.post("", response_model=StudentRead, status_code=status.HTTP_201_CREATED)
-def create_student(data: StudentCreate, db: Session = Depends(get_db)):
-    return StudentService(db).create_student(data)
 
 
 @router.get("/{student_id}", response_model=StudentRead)
