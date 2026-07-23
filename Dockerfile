@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 ARG PYTHON_VERSION=3.13
 
 # ---------- Builder: compila wheels ----------
@@ -36,10 +34,10 @@ RUN pip install --no-index --find-links=/wheels -r requirements.txt && \
     rm -rf /wheels requirements.txt
 
 # Copiar el código: queda /app/app/main.py => `app.main:app` resuelve (cwd /app en sys.path).
-COPY --chown=appuser:appgroup app/ ./app/
+COPY --chown=appuser:appgroup app ./app
 
 # Copiar migraciones Alembic
-COPY --chown=appuser:appgroup alembic/ ./alembic/
+COPY --chown=appuser:appgroup alembic ./alembic
 COPY --chown=appuser:appgroup alembic.ini .
 
 USER appuser

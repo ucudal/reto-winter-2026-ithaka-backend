@@ -6,11 +6,6 @@ class TutorRole(str, Enum):
     TECHNICAL = "Technical"
 
 
-class TutoringType(str, Enum):
-    BUSINESS = "Business"
-    TECHNICAL = "Technical"
-
-
 class UserRole(str, Enum):
     COORDINATOR = "Coordinator"
     BUSINESS_TUTOR = "BusinessTutor"
@@ -21,3 +16,10 @@ class UserRole(str, Enum):
 class DocumentPlatform(str, Enum):
     DRIVE = "Drive"
     SHAREPOINT = "SharePoint"
+
+
+class EntityType(str, Enum):
+    GROUP = "Group"
+    MEETING = "Meeting"
+    DELIVERABLE = "Deliverable"
+    SUPPORT_MATERIAL = "SupportMaterial"

@@ -7,31 +7,31 @@
 **Cohort** — `id`, `year`, `semester`, `start_date`, `end_date` *(nullable)*, `status` *(default: "Active")*, `notes` *(nullable)*
 → relationships: `groups`, `stages`
 
-**Group** — `id`, `name`, `cohort_id` → Cohort, `current_stage_id` → Stage *(nullable)*, `idea` *(nullable)*
-→ relationships: `cohort`, `current_stage`, `students`, `meetings`, `deliverables`, `assignments`
+**Group** — `id`, `name`, `cohort_id` → Cohort, `current_stage_id` → Stage *(nullable)*, `idea` *(nullable)*, `major` *(nullable)*, `status` *(default: "Active")*, `business_tutor_id` → Tutor *(nullable)*, `technical_tutor_id` → Tutor *(nullable)*
+→ relationships: `cohort`, `current_stage`, `students`, `meetings`, `deliverables`, `business_tutor`, `technical_tutor`, `documents`
 
-**Student** — `id`, `name`, `email` *(unique)*, `major` *(nullable)*, `group_id` → Group *(nullable)*
-→ relationships: `group`
+**Student** — `id`, `user_id` → User *(nullable)*, `name`, `email` *(unique)*, `major` *(nullable)*, `group_id` → Group *(nullable)*
+→ relationships: `user`, `group`
 
-**Tutor** — `id`, `name`, `role` *(enum: Business | Technical)*, `specialty` *(nullable)*, `max_capacity` *(default: 0)*, `availability` *(nullable)*, `status` *(default: "Active")*
-→ relationships: `assignments`, `meetings`, `comments`
+**Tutor** — `id`, `user_id` → User *(nullable)*, `name`, `role` *(enum: Business | Technical)*, `specialty` *(nullable)*, `max_capacity` *(default: 0)*, `availability` *(nullable)*, `status` *(default: "Active")*
+→ relationships: `user`, `groups_as_business_tutor`, `groups_as_technical_tutor`, `meetings`, `comments`
 
 **Stage** — `id`, `cohort_id` → Cohort, `name`, `order`, `key_dates` *(JSONB, nullable — list of `{description, date}`)*
 → relationships: `cohort`, `groups`, `deliverables`, `support_materials`
 
-**Meeting** — `id`, `group_id` → Group, `tutor_id` → Tutor, `date` *(datetime with tz)*, `participants` *(JSONB list of ids, nullable)*, `notes` *(nullable)*, `next_steps` *(nullable)*, `hours_spent` *(nullable)*, `links` *(JSONB list of `{type, url}`, nullable)*
-→ relationships: `group`, `tutor`
+**Meeting** — `id`, `group_id` → Group, `tutor_ids` *(JSONB list of tutor ids — una reunión puede tener uno o más tutores)*, `date` *(datetime with tz)*, `participants` *(JSONB list of ids, nullable)*, `notes` *(nullable)*, `next_steps` *(nullable)*, `hours_spent` *(nullable)*, `links` *(JSONB list of `{type, url}`, nullable)*
+→ relationships: `group`
 
 **Deliverable** — `id`, `group_id` → Group, `stage_id` → Stage, `expected_date`, `status` *(default: "Pending")*
-→ relationships: `group`, `stage`, `documents`, `comments`
+→ relationships: `group`, `stage`, `documents` *(derivada vía `Document.entity_type='Deliverable'`)*, `comments`
 
 **Comment** — `id`, `tutor_id` → Tutor, `deliverable_id` → Deliverable, `content`
 → relationships: `tutor`
 
-**Document** — `id`, `deliverable_id` → Deliverable, `url`, `platform` *(enum: Drive | SharePoint)*, `order`
-→ relationships: `deliverable`
+**Document** — `id`, `entity_type` *(enum: Group | Meeting | Deliverable | SupportMaterial)*, `entity_id`, `url`, `platform` *(enum: Drive | SharePoint)*, `order`
+→ relationships: *(polimórfica — se resuelve por `entity_type` + `entity_id`, no por FK fija)*
 
-**SupportMaterial** — `id`, `title`, `url`
+**SupportMaterial** — `id`, `stage_id` → Stage, `title`, `url`
 → relationships: `stage`
 
 ## Support / infrastructure
@@ -45,6 +45,7 @@
 | `TutorRole` | `Business`, `Technical` |
 | `UserRole` | `Coordinator`, `BusinessTutor`, `TechnicalTutor`, `Student` |
 | `DocumentPlatform` | `Drive`, `SharePoint` |
+| `EntityType` | `Group`, `Meeting`, `Deliverable`, `SupportMaterial` *(usado por `Document.entity_type`)* |
 
 ---
 
@@ -53,7 +54,6 @@
 ```
 # Cohorts
 GET    /api/cohorts
-POST   /api/cohorts
 GET    /api/cohorts/{id}
 PUT    /api/cohorts/{id}
 GET    /api/cohorts/{id}/groups
@@ -61,25 +61,23 @@ GET    /api/cohorts/{id}/stages
 
 # Groups
 GET    /api/groups
-POST   /api/groups
 GET    /api/groups/{id}
 PUT    /api/groups/{id}
 DELETE /api/groups/{id}
 GET    /api/groups/{id}/students
 GET    /api/groups/{id}/meetings
 GET    /api/groups/{id}/deliverables
-PATCH  /api/groups/{id}/stage
+GET    /api/groups/{id}/documents
+PUT   /api/groups/{id}/documents
 
 # Students
 GET    /api/students
-POST   /api/students
 GET    /api/students/{id}
 PUT    /api/students/{id}
 DELETE /api/students/{id}
 
 # Tutors
 GET    /api/tutors
-POST   /api/tutors
 GET    /api/tutors/{id}
 PUT    /api/tutors/{id}
 GET    /api/tutors/{id}/groups
@@ -88,15 +86,13 @@ GET    /api/tutors/overloaded
 
 # Stages
 GET    /api/cohorts/{cohortId}/stages
-POST   /api/cohorts/{cohortId}/stages
+PUT   /api/cohorts/{cohortId}/stages
 GET    /api/stages/{id}
-PUT    /api/stages/{id}
 GET    /api/stages/{id}/deliverables
 GET    /api/stages/{id}/materials
 
 # Meetings
 GET    /api/meetings
-POST   /api/meetings
 GET    /api/meetings/{id}
 PUT    /api/meetings/{id}
 DELETE /api/meetings/{id}
@@ -104,16 +100,16 @@ GET    /api/groups/{groupId}/meetings/total-hours
 
 # Deliverables
 GET    /api/deliverables
-POST   /api/deliverables
 GET    /api/deliverables/{id}
 PUT    /api/deliverables/{id}
-PATCH  /api/deliverables/{id}/status
 GET    /api/deliverables/pending
 GET    /api/deliverables/overdue
 
-# Documents
+# Documents (polimórfico: hoy soporta Group y Deliverable como entity_type)
 GET    /api/deliverables/{deliverableId}/documents
-POST   /api/deliverables/{deliverableId}/documents
+PUT   /api/deliverables/{deliverableId}/documents
+GET    /api/groups/{id}/documents
+PUT   /api/groups/{id}/documents
 DELETE /api/documents/{id}
 
 # Comments
@@ -123,7 +119,6 @@ DELETE /api/comments/{id}
 
 # Support Materials
 GET    /api/materials
-POST   /api/materials
 GET    /api/materials/{id}
 PUT    /api/materials/{id}
 DELETE /api/materials/{id}
@@ -156,7 +151,7 @@ POST   /api/users
   "group_count": 12
 }
 
-// POST /api/cohorts (request)
+// PUT /api/cohorts/{id} (request)
 {
   "year": 2026,
   "semester": 1,
@@ -178,24 +173,29 @@ POST   /api/users
     "id": 2,
     "name": "Preliminary Project"
   },
+  "business_tutor": {
+    "id": 8,
+    "name": "María Pérez"
+  },
+  "technical_tutor": {
+    "id": 14,
+    "name": "Diego Ramírez"
+  },
   "students": [
     { "id": 101, "name": "Ana Fernández" },
     { "id": 102, "name": "Luca Rossi" }
   ]
 }
 
-// POST /api/groups (request)
+// PUT /api/groups/{id} (request)
 {
   "name": "EcoRoute",
   "cohort_id": 1,
   "idea": "Recycling route platform for companies",
   "student_ids": [101, 102],
-  "current_stage_id": 2
-}
-
-// PATCH /api/groups/{id}/stage (request)
-{
-  "stage_id": 3
+  "current_stage_id": 2,
+  "business_tutor_id": 8,
+  "technical_tutor_id": 14
 }
 ```
 
@@ -210,7 +210,7 @@ POST   /api/users
   "group_id": 45
 }
 
-// POST /api/students (request)
+// PUT /api/students/{id} (request)
 {
   "name": "Ana Fernández",
   "email": "ana.fernandez@ucu.edu.uy",
@@ -233,6 +233,8 @@ POST   /api/users
 }
 
 // GET /api/tutors/{id}/capacity
+// "groups" y "hours_consumed" se calculan a partir de los grupos donde este
+// tutor es business_tutor o technical_tutor, sumando las horas de sus meetings.
 {
   "tutor_id": 8,
   "max_capacity": 88,
@@ -268,10 +270,10 @@ POST   /api/users
 
 ### Meeting
 ```json
-// POST /api/meetings (request)
+// PUT /api/meetings/{id} (request)
 {
   "group_id": 45,
-  "tutor_id": 8,
+  "tutor_ids": [8, 14],
   "date": "2026-04-10T15:00:00Z",
   "participants": [101, 102],
   "notes": "Value proposition discussed. Business model adjusted for next deliverable.",
@@ -308,22 +310,20 @@ POST   /api/users
   ]
 }
 
-// POST /api/deliverables (request)
+// PUT /api/deliverables/{id} (request)
 {
   "group_id": 45,
   "stage_id": 2,
-  "expected_date": "2026-04-20"
-}
-
-// PATCH /api/deliverables/{id}/status (request)
-{
+  "expected_date": "2026-04-20",
   "status": "Under review"
 }
 ```
 
 ### Document
 ```json
-// POST /api/deliverables/{deliverableId}/documents (request)
+// PUT /api/deliverables/{deliverableId}/documents (request)
+// El endpoint sigue siendo específico por entidad (más simple de usar desde el
+// frontend), pero internamente guarda entity_type="Deliverable" y entity_id={deliverableId}.
 {
   "url": "https://drive.google.com/ecoroute-doc",
   "platform": "Drive",
@@ -332,8 +332,15 @@ POST   /api/users
 
 // GET /api/deliverables/{deliverableId}/documents
 [
-  { "id": 30, "deliverable_id": 5, "url": "https://drive.google.com/ecoroute-doc", "platform": "Drive", "order": 1 }
+  { "id": 30, "entity_type": "Deliverable", "entity_id": 5, "url": "https://drive.google.com/ecoroute-doc", "platform": "Drive", "order": 1 }
 ]
+
+// PUT /api/groups/{id}/documents (request) — mismo patrón, ahora disponible también para Group
+{
+  "url": "https://drive.google.com/ecoroute-repo",
+  "platform": "Drive",
+  "order": 1
+}
 ```
 
 ### Comment
@@ -354,11 +361,12 @@ POST   /api/users
 ```json
 // GET /api/materials
 [
-  { "id": 12, "title": "Business Model Canvas Template", "url": "https://drive.google.com/bmc-template" }
+  { "id": 12, "stage_id": 2, "title": "Business Model Canvas Template", "url": "https://drive.google.com/bmc-template" }
 ]
 
-// POST /api/materials (request)
+// PUT /api/materials/{id} (request)
 {
+  "stage_id": 2,
   "title": "Business Model Canvas Template",
   "url": "https://drive.google.com/bmc-template"
 }
@@ -367,6 +375,8 @@ POST   /api/users
 ### Dashboard
 ```json
 // GET /api/dashboard/summary
+// "GroupWithoutTutor" = business_tutor_id o technical_tutor_id es NULL.
+// "OverloadedTutor" = suma de horas de meetings > max_capacity del tutor.
 {
   "active_groups": 42,
   "active_tutors": 18,
