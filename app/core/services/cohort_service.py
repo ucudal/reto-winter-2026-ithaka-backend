@@ -26,6 +26,12 @@ class CohortService:
         return self._to_read(db, cohort)
 
     def upsert_cohort(self, db: Session, payload: CohortUpsertRequest) -> CohortRead:
+        if payload.semester not in (1, 2):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Semester must be 1 or 2",
+            )
+        
         if payload.id is None:
             cohort = self.repository.create(db, payload)
         else:
