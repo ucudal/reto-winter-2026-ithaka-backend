@@ -4,7 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.cohort import router as cohort_router
 from app.api.meetings_api import router as meetings_router
+from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
+from app.api.stage_api import router as stages_router
+
+from app.api.groups_api import router as groups_router
 
 app = FastAPI(
     title="Ithaka Backend",
@@ -23,4 +27,7 @@ app.add_middleware(
 
 app.include_router(health_router)
 app.include_router(meetings_router)
+app.include_router(stages_router)
 app.include_router(cohort_router)
+
+app.include_router(groups_router)
