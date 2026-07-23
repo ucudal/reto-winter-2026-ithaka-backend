@@ -1,17 +1,16 @@
-from __future__ import annotations
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
-from pydantic import BaseModel, ConfigDict
+from app.core.db.session import get_db
+from app.core.schemas.comment import CommentRead
+from app.core.services.comment_service import CommentService
+
+router = APIRouter(tags=["Comments"])
+service = CommentService()
 
 
-class CommentRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+@router.get("/api/deliverables/{deliverable_id}/comments", response_model=list[CommentRead])
+def list_comments_by_deliverable(deliverable_id: int, db: Session = Depends(get_db)):
+    return service.list_comments_by_deliverable(db, deliverable_id)
 
-    id: int
-    tutor_id: int
-    deliverable_id: int
-    content: str
 
-class CommentCreateRequest(BaseModel):
-    tutor_id: int
-    deliverable_id: int
-    content: str
