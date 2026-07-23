@@ -17,10 +17,15 @@ def get_cohort_service() -> CohortService:
 
 @router.get("", response_model=list[CohortRead])
 def list_cohorts(
+    year: int | None = None,
+    semester: int | None = None,
+    status: str | None = None,
+    page: int = 1,
+    page_size: int = 10,
     db: Session = Depends(get_db),
     service: CohortService = Depends(get_cohort_service),
 ):
-    return service.list_cohorts(db)
+    return service.list_cohorts(db, year=year, semester=semester, status=status, page=page, page_size=page_size)
 
 
 @router.get("/{cohort_id}", response_model=CohortRead)

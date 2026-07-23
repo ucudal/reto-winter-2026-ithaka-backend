@@ -17,8 +17,8 @@ class CohortService:
     def __init__(self, repository: CohortRepository | None = None):
         self.repository = repository or CohortRepository()
 
-    def list_cohorts(self, db: Session) -> list[CohortRead]:
-        cohorts = self.repository.list(db)
+    def list_cohorts(self, db: Session, year: int | None = None, semester: int | None = None, status: str | None = None, page: int = 1, page_size: int = 10) -> list[CohortRead]:
+        cohorts = self.repository.list(db, year=year, semester=semester, status=status, page=page, page_size=page_size)
         return [self._to_read(db, cohort) for cohort in cohorts]
 
     def get_cohort(self, db: Session, cohort_id: int) -> CohortRead:
