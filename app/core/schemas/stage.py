@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class StageBase(BaseModel):
@@ -11,7 +11,23 @@ class StageBase(BaseModel):
 
 
 class StageUpsert(StageBase):
-    pass
+    id: int | None = None
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "cohort_id": 2,
+                "name": "Planning",
+                "order": 1,
+                "key_dates": [
+                    {
+                        "description": "Kickoff",
+                        "date": "2026-07-22",
+                    }
+                ],
+            }
+        }
+    )
 
 
 class StageRead(StageBase):
