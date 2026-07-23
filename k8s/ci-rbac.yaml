@@ -1,0 +1,42 @@
+# ServiceAccount con permisos MÍNIMOS para que el CI (GitHub Actions) despliegue.
+# Aplicar UNA vez en el cluster (requiere permisos de RBAC): kubectl apply -f k8s/ci-rbac.yaml
+#
+# Generar el token para el secret KUBE_TOKEN de GitHub:
+#   kubectl create token ci-deployer -n ithaka-backend --duration=8760h
+# Obtener el CA del cluster para KUBE_CA_CERT (ya viene en base64):
+#   kubectl config view --raw -o jsonpath='{.clusters[0].cluster.certificate-authority-data}'
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-deployer
+  namespace: ithaka-backend
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ci-deployer
+  namespace: ithaka-backend
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch", "patch", "update"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-deployer
+  namespace: ithaka-backend
+subjects:
+  - kind: ServiceAccount
+    name: ci-deployer
+    namespace: ithaka-backend
+roleRef:
+  kind: Role
+  name: ci-deployer
+  apiGroup: rbac.authorization.k8s.io
