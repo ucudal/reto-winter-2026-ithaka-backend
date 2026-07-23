@@ -7,7 +7,7 @@ from app.api.health import router as health_router
 from app.api.tutors_api import router as tutors_router
 from app.api.stage_api import router as stages_router
 from app.api.groups_api import router as groups_router
-
+from app.api.dashboard_api import router as dashboard_router
 
 app = FastAPI(
     title="Ithaka Backend",
@@ -29,3 +29,4 @@ app.include_router(tutors_router)
 app.include_router(stages_router)
 app.include_router(cohort_router)
 app.include_router(groups_router)
+app.include_router(dashboard_router)
