@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.db.session import get_db
@@ -17,11 +17,11 @@ def get_cohort_service() -> CohortService:
 
 @router.get("", response_model=list[CohortRead])
 def list_cohorts(
-    year: int | None = None,
-    semester: int | None = None,
-    status: str | None = None,
-    page: int = 1,
-    page_size: int = 10,
+    year: int | None = Query(None),
+    semester: int | None = Query(None),
+    status: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     service: CohortService = Depends(get_cohort_service),
 ):
