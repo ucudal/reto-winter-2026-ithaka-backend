@@ -6,6 +6,8 @@ from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
 from app.api.stage_api import router as stages_router
 
+from app.api.groups_api import router as groups_router
+
 app = FastAPI(
     title="Ithaka Backend",
     version="0.1.0",
@@ -24,3 +26,5 @@ app.add_middleware(
 app.include_router(health_router)
 app.include_router(stages_router)
 app.include_router(cohort_router)
+
+app.include_router(groups_router)
