@@ -5,7 +5,7 @@ from datetime import date
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models.deliverable import Deliverable
+from app.core.models.deliverable import Deliverable
 
 
 def get_all_deliverables(db: Session) -> list[Deliverable]:
