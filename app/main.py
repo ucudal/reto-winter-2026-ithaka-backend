@@ -2,6 +2,8 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.cohort import router as cohort_router
+from app.api.meetings_api import router as meetings_router
 from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
 from app.api.tutors_api import router as tutors_router
@@ -25,6 +27,7 @@ app.add_middleware(
 
 
 app.include_router(health_router)
+app.include_router(meetings_router)
 app.include_router(tutors_router)
 app.include_router(stages_router)
 app.include_router(cohort_router)
