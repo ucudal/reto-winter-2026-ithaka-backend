@@ -35,3 +35,4 @@ class MeetingRepository:
 
     def get_group(self, db: Session, group_id: int) -> Group | None:
         return db.get(Group, group_id)
+    

@@ -12,7 +12,7 @@ class MeetingLink(BaseModel):
 
 class MeetingBase(BaseModel):
     group_id: int
-    tutor_ids: list[int] | None = None
+    tutor_ids: list[int]
     date: datetime
     participants: list[int] | None = None
     notes: str | None = None

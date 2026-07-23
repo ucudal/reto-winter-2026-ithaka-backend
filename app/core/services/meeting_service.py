@@ -69,3 +69,4 @@ class MeetingService:
                 detail="Meeting not found",
             )
         return meeting
+    
