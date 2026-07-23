@@ -8,7 +8,7 @@ from pydantic import BaseModel, ConfigDict
 class DeliverableRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
  
-    id: int
+    id: int | None = None
     group_id: int
     stage_id: int
     expected_date: date
