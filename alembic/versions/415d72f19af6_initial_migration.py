@@ -1,8 +1,8 @@
-"""create core tables
+"""initial migration
 
-Revision ID: 223393d05097
+Revision ID: 415d72f19af6
 Revises: 
-Create Date: 2026-07-20 23:48:39.531729
+Create Date: 2026-07-21 20:48:30.234896
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '223393d05097'
+revision = '415d72f19af6'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -28,14 +28,13 @@ def upgrade() -> None:
     sa.Column('notes', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('tutors',
+    op.create_table('documents',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=120), nullable=False),
-    sa.Column('role', sa.Enum('BUSINESS', 'TECHNICAL', name='tutor_role'), nullable=False),
-    sa.Column('specialty', sa.String(length=200), nullable=True),
-    sa.Column('max_capacity', sa.Integer(), nullable=False),
-    sa.Column('availability', sa.String(length=200), nullable=True),
-    sa.Column('status', sa.String(length=30), nullable=False),
+    sa.Column('entity_type', sa.Enum('GROUP', 'MEETING', 'DELIVERABLE', 'SUPPORT_MATERIAL', name='entity_type'), nullable=False),
+    sa.Column('entity_id', sa.Integer(), nullable=False),
+    sa.Column('url', sa.String(length=500), nullable=False),
+    sa.Column('platform', sa.Enum('DRIVE', 'SHAREPOINT', name='document_platform'), nullable=False),
+    sa.Column('order', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
@@ -56,14 +55,32 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['cohort_id'], ['cohorts.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('tutors',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('name', sa.String(length=120), nullable=False),
+    sa.Column('role', sa.Enum('BUSINESS', 'TECHNICAL', name='tutor_role'), nullable=False),
+    sa.Column('specialty', sa.String(length=200), nullable=True),
+    sa.Column('max_capacity', sa.Integer(), nullable=False),
+    sa.Column('availability', sa.String(length=200), nullable=True),
+    sa.Column('status', sa.String(length=30), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='SET NULL'),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('groups',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('cohort_id', sa.Integer(), nullable=False),
     sa.Column('current_stage_id', sa.Integer(), nullable=True),
     sa.Column('idea', sa.Text(), nullable=True),
+    sa.Column('major', sa.String(length=120), nullable=True),
+    sa.Column('status', sa.String(length=30), nullable=False),
+    sa.Column('business_tutor_id', sa.Integer(), nullable=True),
+    sa.Column('technical_tutor_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['business_tutor_id'], ['tutors.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['cohort_id'], ['cohorts.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['current_stage_id'], ['stages.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['technical_tutor_id'], ['tutors.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('support_materials',
@@ -87,7 +104,7 @@ def upgrade() -> None:
     op.create_table('meetings',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('group_id', sa.Integer(), nullable=False),
-    sa.Column('tutor_id', sa.Integer(), nullable=False),
+    sa.Column('tutor_ids', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('date', sa.DateTime(timezone=True), nullable=False),
     sa.Column('participants', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('notes', sa.Text(), nullable=True),
@@ -95,16 +112,17 @@ def upgrade() -> None:
     sa.Column('hours_spent', sa.Numeric(precision=5, scale=2), nullable=True),
     sa.Column('links', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['tutor_id'], ['tutors.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('students',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(length=120), nullable=False),
     sa.Column('email', sa.String(length=190), nullable=False),
     sa.Column('major', sa.String(length=120), nullable=True),
     sa.Column('group_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['group_id'], ['groups.id'], ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
@@ -117,29 +135,20 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['tutor_id'], ['tutors.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('documents',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('deliverable_id', sa.Integer(), nullable=False),
-    sa.Column('url', sa.String(length=500), nullable=False),
-    sa.Column('platform', sa.Enum('DRIVE', 'SHAREPOINT', name='document_platform'), nullable=False),
-    sa.Column('order', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['deliverable_id'], ['deliverables.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
-    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('documents')
     op.drop_table('comments')
     op.drop_table('students')
     op.drop_table('meetings')
     op.drop_table('deliverables')
     op.drop_table('support_materials')
     op.drop_table('groups')
+    op.drop_table('tutors')
     op.drop_table('stages')
     op.drop_table('users')
-    op.drop_table('tutors')
+    op.drop_table('documents')
     op.drop_table('cohorts')
     # ### end Alembic commands ###
