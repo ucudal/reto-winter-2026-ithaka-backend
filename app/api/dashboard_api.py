@@ -9,3 +9,4 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 @router.get("/summary", response_model=DashboardSummary)
 def get_dashboard_summary(service: DashboardService = Depends(get_dashboard_service)):
     return service.get_summary()
+
