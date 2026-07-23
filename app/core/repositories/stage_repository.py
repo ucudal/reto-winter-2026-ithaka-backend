@@ -15,14 +15,16 @@ class StageRepository:
     def get_by_id(self, stage_id: int) -> Stage | None:
         return self.db.query(Stage).filter(Stage.id == stage_id).first()
 
-    def upsert(self, stage_id: int, data: StageUpsert) -> Stage:
-        stage = self.get_by_id(stage_id)
-        if stage is None:
-            stage = Stage(id=stage_id, **data.model_dump())
-            self.db.add(stage)
-        else:
-            for field, value in data.model_dump().items():
-                setattr(stage, field, value)
+    def create(self, data: StageUpsert) -> Stage:
+        stage = Stage(**data.model_dump(exclude={"id"}))
+        self.db.add(stage)
+        self.db.commit()
+        self.db.refresh(stage)
+        return stage
+
+    def update(self, stage: Stage, data: StageUpsert) -> Stage:
+        for field, value in data.model_dump(exclude={"id"}).items():
+            setattr(stage, field, value)
         self.db.commit()
         self.db.refresh(stage)
         return stage
