@@ -1,23 +1,15 @@
 from pydantic import BaseModel
 
 
-class GroupCreate(BaseModel):
-    name: str
-    cohort_id: int
-    current_stage_id: int | None = None
-    idea: str = ""
-    major: str | None = None
-    business_tutor_id: int | None = None
-    technical_tutor_id: int | None = None
-
-
-class GroupUpdate(BaseModel):
+class GroupUpsert(BaseModel):
+    id: int | None = None
     name: str
     cohort_id: int
     current_stage_id: int | None = None
     idea: str = ""
     major: str | None = None
     status: str = "Active"
+    student_ids: list[int]
     business_tutor_id: int | None = None
     technical_tutor_id: int | None = None
 

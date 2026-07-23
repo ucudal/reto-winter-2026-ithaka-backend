@@ -3,13 +3,18 @@ from __future__ import annotations
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.repositories.cohort_repository import CohortRepository
 from app.core.repositories.group_repository import GroupRepository
-from app.core.schemas.group import GroupCreate, GroupUpdate, GroupResponse
+from app.core.models.stage import Stage
+from app.core.models.student import Student
+from app.core.models.tutor import Tutor
+from app.core.schemas.group import GroupUpsert, GroupResponse
 
 
 class GroupService:
 
     def __init__(self, repository: GroupRepository | None = None):
+        self.cohort_repository = CohortRepository()
         self.repository = repository or GroupRepository()
 
     def list_groups(self, db: Session) -> list[GroupResponse]:
@@ -20,13 +25,20 @@ class GroupService:
         group = self._get_or_404(db, group_id)
         return GroupResponse.model_validate(group, from_attributes=True)
 
-    def create_group(self, db: Session, payload: GroupCreate) -> GroupResponse:
-        group = self.repository.create(db, payload)
-        return GroupResponse.model_validate(group, from_attributes=True)
+    def upsert_group(self, db: Session, payload: GroupUpsert) -> GroupResponse:
+        target_id = self._normalize_id(payload.id)
+        self._ensure_cohort_exists(db, payload.cohort_id)
+        self._ensure_students_exist(db, payload.student_ids)
+        self._ensure_optional_fk_exists(db, Stage, payload.current_stage_id, "Stage not found")
+        self._ensure_optional_fk_exists(db, Tutor, payload.business_tutor_id, "Business tutor not found")
+        self._ensure_optional_fk_exists(db, Tutor, payload.technical_tutor_id, "Technical tutor not found")
 
-    def update_group(self, db: Session, group_id: int, payload: GroupUpdate) -> GroupResponse:
-        group = self._get_or_404(db, group_id)
-        group = self.repository.update(db, group, payload)
+        if target_id is None:
+            group = self.repository.create(db, payload)
+        else:
+            group = self._get_or_404(db, target_id)
+            group = self.repository.update(db, group, payload)
+
         return GroupResponse.model_validate(group, from_attributes=True)
 
     def delete_group(self, db: Session, group_id: int) -> None:
@@ -58,3 +70,40 @@ class GroupService:
                 detail="Group not found",
             )
         return group
+
+    def _ensure_cohort_exists(self, db: Session, cohort_id: int) -> None:
+        if self.cohort_repository.get_by_id(db, cohort_id) is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Cohort not found: {cohort_id}",
+            )
+
+    def _ensure_optional_fk_exists(self, db: Session, model, value: int | None, detail: str) -> None:
+        if value is None:
+            return
+
+        if db.get(model, value) is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"{detail}: {value}",
+            )
+
+    def _ensure_students_exist(self, db: Session, student_ids: list[int]) -> None:
+        if len(student_ids) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Group must have at least one student",
+            )
+
+        for student_id in student_ids:
+            if db.get(Student, student_id) is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Student not found: {student_id}",
+                )
+
+    @staticmethod
+    def _normalize_id(value: int | None) -> int | None:
+        if value is None or value <= 0:
+            return None
+        return value

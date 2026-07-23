@@ -4,7 +4,8 @@ from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.core.models.group import Group
-from app.core.schemas.group import GroupCreate, GroupUpdate
+from app.core.models.student import Student
+from app.core.schemas.group import GroupUpsert
 
 
 class GroupRepository:
@@ -16,19 +17,21 @@ class GroupRepository:
     def get_by_id(self, db: Session, group_id: int) -> Group | None:
         return db.get(Group, group_id)
 
-    def create(self, db: Session, payload: GroupCreate) -> Group:
-        group = Group(**payload.model_dump())
+    def create(self, db: Session, payload: GroupUpsert) -> Group:
+        group = Group(**payload.model_dump(exclude={"id", "student_ids"}))
         db.add(group)
         db.flush()
+        self._sync_students(db, group, payload.student_ids)
         self._sync_id_sequence(db)
         db.commit()
         db.refresh(group)
         return group
 
-    def update(self, db: Session, group: Group, payload: GroupUpdate) -> Group:
-        for field, value in payload.model_dump().items():
+    def update(self, db: Session, group: Group, payload: GroupUpsert) -> Group:
+        for field, value in payload.model_dump(exclude={"id", "student_ids"}).items():
             setattr(group, field, value)
 
+        self._sync_students(db, group, payload.student_ids)
         db.commit()
         db.refresh(group)
         return group
@@ -52,3 +55,13 @@ class GroupRepository:
             text("SELECT setval(:sequence_name, COALESCE((SELECT MAX(id) FROM groups), 1), true)"),
             {"sequence_name": sequence_name},
         )
+
+    def _sync_students(self, db: Session, group: Group, student_ids: list[int]) -> None:
+        students: list[Student] = []
+        for student_id in student_ids:
+            student = db.get(Student, student_id)
+            if student is None:
+                raise ValueError(f"Student not found: {student_id}")
+            students.append(student)
+
+        group.students = students

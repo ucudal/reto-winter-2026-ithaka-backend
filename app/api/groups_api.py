@@ -3,10 +3,8 @@ from sqlalchemy.orm import Session
 from app.core.db.session import get_db
 
 from app.core.schemas.group import (
-    GroupCreate,
-    GroupUpdate,
-    GroupResponse,
-    GroupStageUpdate,
+    GroupUpsert,
+    GroupResponse
 )
 from app.core.services.group_service import GroupService
 
@@ -33,23 +31,13 @@ def get_group(
     return service.get_group(db, group_id)
 
 
-@router.post("", response_model=GroupResponse, status_code=201)
-def create_group(
-    data: GroupCreate,
+@router.put("", response_model=GroupResponse)
+def upsert_group(
+    data: GroupUpsert,
     db: Session = Depends(get_db),
     service: GroupService = Depends(get_group_service),
 ):
-    return service.create_group(db, data)
-
-
-@router.put("/{group_id}", response_model=GroupResponse)
-def update_group(
-    group_id: int,
-    data: GroupUpdate,
-    db: Session = Depends(get_db),
-    service: GroupService = Depends(get_group_service),
-):
-    return service.update_group(db, group_id, data)
+    return service.upsert_group(db, data)
 
 
 @router.delete("/{group_id}", status_code=204)
@@ -86,15 +74,5 @@ def get_group_deliverables(
     service: GroupService = Depends(get_group_service),
 ):
     return service.get_group_deliverables(db, group_id)
-
-
-@router.patch("/{group_id}/stage", response_model=GroupResponse)
-def change_group_stage(
-    group_id: int,
-    data: GroupStageUpdate,
-    db: Session = Depends(get_db),
-    service: GroupService = Depends(get_group_service),
-):
-    return service.change_stage(db, group_id, data.stage_id)
 
 
