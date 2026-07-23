@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.cohort import router as cohort_router
+from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
 from app.api.stage_api import router as stages_router
 
