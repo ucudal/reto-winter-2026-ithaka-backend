@@ -7,6 +7,7 @@ from app.core.models import (
     Deliverable, Meeting, SupportMaterial, Document, Comment
 )
 from app.core.models.enums import UserRole, TutorRole, DocumentPlatform, EntityType
+from app.core.security import hash_password
 
 
 def seed_database(force: bool = False):
@@ -35,12 +36,13 @@ def seed_database(force: bool = False):
 
         # 1. Crear Usuarios
         print("- Creando Usuarios...")
-        u_coord = User(name="Sofía Martínez", email="coord@ithaka.ucu.edu.uy", role=UserRole.COORDINATOR, password_hash="pbkdf2_sha256$hash_mock")
-        u_tut1 = User(name="María Pérez", email="maria.perez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash="pbkdf2_sha256$hash_mock")
-        u_tut2 = User(name="Diego Ramírez", email="diego.ramirez@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash="pbkdf2_sha256$hash_mock")
-        u_tut3 = User(name="Lucía Gómez", email="lucia.gomez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash="pbkdf2_sha256$hash_mock")
-        u_std1 = User(name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash="pbkdf2_sha256$hash_mock")
-        u_std2 = User(name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash="pbkdf2_sha256$hash_mock")
+        default_pwd_hash = hash_password("password")
+        u_coord = User(name="Sofía Martínez", email="coord@ithaka.ucu.edu.uy", role=UserRole.COORDINATOR, password_hash=default_pwd_hash)
+        u_tut1 = User(name="María Pérez", email="maria.perez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash)
+        u_tut2 = User(name="Diego Ramírez", email="diego.ramirez@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash)
+        u_tut3 = User(name="Lucía Gómez", email="lucia.gomez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash)
+        u_std1 = User(name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash)
+        u_std2 = User(name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash)
         
         db.add_all([u_coord, u_tut1, u_tut2, u_tut3, u_std1, u_std2])
         db.flush()
