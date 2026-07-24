@@ -55,7 +55,7 @@
 # Cohorts
 GET    /api/cohorts
 GET    /api/cohorts/{id}
-PUT    /api/cohorts/{id}
+PUT    /api/cohorts
 GET    /api/cohorts/{id}/groups
 GET    /api/cohorts/{id}/stages
 
@@ -151,8 +151,9 @@ POST   /api/users
   "group_count": 12
 }
 
-// PUT /api/cohorts/{id} (request)
+// PUT /api/cohorts (request)
 {
+  "id": 1,
   "year": 2026,
   "semester": 1,
   "start_date": "2026-03-01",
