@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from app.core.models.student import Student
+from app.core.schemas.student import StudentUpsert
 
 
 class StudentRepository:
@@ -11,9 +12,20 @@ class StudentRepository:
 
     def get_by_id(self, student_id: int) -> Student | None:
         return self.db.get(Student, student_id)
+    
+    def create(self, data: StudentUpsert) -> Student:
+        student = Student(
+            **data.model_dump(exclude={"id"})
+        )
 
-    def update(self, student: Student, data: dict) -> Student:
-        for key, value in data.items():
+        self.db.add(student)
+        self.db.commit()
+        self.db.refresh(student)
+
+        return student
+
+    def update(self, student: Student, data: StudentUpsert) -> Student:
+        for key, value in data.model_dump(exclude={"id"}).items():
             setattr(student, key, value)
         self.db.commit()
         self.db.refresh(student)

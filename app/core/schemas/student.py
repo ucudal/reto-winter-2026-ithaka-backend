@@ -8,10 +8,19 @@ class StudentBase(BaseModel):
     group_id: int | None = None 
 
 
-class StudentUpdate(StudentBase):
+class StudentUpsert(StudentBase):
     id: int | None = None
+    name: str
+    email: EmailStr
+    major: str | None = None
+    group_id: int | None = None
 
 
 class StudentRead(StudentBase):
     id: int
+    name: str
+    email: EmailStr
+    major: str | None = None
+    group_id: int | None = None
+
     model_config = ConfigDict(from_attributes=True)

@@ -2,7 +2,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.models.group import Group
 from app.core.repositories.student_repository import StudentRepository
-from app.core.schemas.student import StudentUpdate
+from app.core.schemas.student import StudentUpsert
 
 
 class StudentService:
@@ -23,10 +23,18 @@ class StudentService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
         return student
 
-    def update_student(self, data: StudentUpdate):
-        student = self.get_student(data.student_id)  # 404 si no existe
+    def upsert_student(self, data: StudentUpsert):
         self._check_group_exists(data.group_id)
-        return self.repo.update(student, data.model_dump())
+        
+        if data.id is None:
+            return self.repo.create(data)
+        
+        student = self.repo.get_by_id(data.id)
+
+        if student is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+
+        return self.repo.update(student, data)
 
     def delete_student(self, student_id: int):
         student = self.get_student(student_id)  # 404 si no existe
