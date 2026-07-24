@@ -74,5 +74,3 @@ def get_group_deliverables(
     service: GroupService = Depends(get_group_service),
 ):
     return service.get_group_deliverables(db, group_id)
-
-
