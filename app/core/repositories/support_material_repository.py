@@ -12,14 +12,6 @@ class SupportMaterialRepository:
         )
         return list(db.scalars(statement).all())
 
-    def list_by_stage(self, db: Session, stage_id: int) -> list[SupportMaterial]:
-        statement = (
-            select(SupportMaterial)
-            .where(SupportMaterial.stage_id == stage_id)
-            .order_by(SupportMaterial.id.asc())
-        )
-        return list(db.scalars(statement).all())
-
     def get_by_id(self, db: Session, material_id: int) -> SupportMaterial | None:
         return db.get(SupportMaterial, material_id)
 

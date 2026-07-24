@@ -18,12 +18,6 @@ class SupportMaterialService:
         materials = self.repository.list(db)
         return [self._to_read(material) for material in materials]
 
-    def list_by_stage(
-        self, db: Session, stage_id: int
-    ) -> list[SupportMaterialRead]:
-        materials = self.repository.list_by_stage(db, stage_id)
-        return [self._to_read(material) for material in materials]
-
     def upsert_material(
         self, db: Session, payload: SupportMaterialUpsertRequest
     ) -> SupportMaterialRead:
