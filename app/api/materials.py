@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.db.session import get_db
@@ -20,10 +20,16 @@ def get_support_material_service() -> SupportMaterialService:
 
 @router.get("", response_model=list[SupportMaterialRead])
 def list_materials(
+    stage_id: int | None = Query(None),
+    search: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     service: SupportMaterialService = Depends(get_support_material_service),
 ):
-    return service.list_materials(db)
+    return service.list_materials(db, stage_id=stage_id, search=search, page=page, page_size=page_size
+    )
+
 
 
 @router.get("/stage/{stage_id}", response_model=list[SupportMaterialRead])
