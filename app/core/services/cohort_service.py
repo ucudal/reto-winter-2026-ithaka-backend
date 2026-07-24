@@ -17,22 +17,22 @@ class CohortService:
     def __init__(self, repository: CohortRepository | None = None):
         self.repository = repository or CohortRepository()
 
-    def list_cohorts(self, db: Session) -> list[CohortRead]:
-        cohorts = self.repository.list(db)
+    def list_cohorts(self, db: Session, year: int | None = None, semester: int | None = None, status: str | None = None, page: int = 1, page_size: int = 10) -> list[CohortRead]:
+        cohorts = self.repository.list(db, year=year, semester=semester, status=status, page=page, page_size=page_size)
         return [self._to_read(db, cohort) for cohort in cohorts]
 
     def get_cohort(self, db: Session, cohort_id: int) -> CohortRead:
         cohort = self._get_or_404(db, cohort_id)
         return self._to_read(db, cohort)
 
-    def upsert_cohort(
-        self,
-        db: Session,
-        payload: CohortUpsertRequest,
-    ) -> CohortRead:
-        target_id = self._normalize_id(payload.id)
-
-        if target_id is None:
+    def upsert_cohort(self, db: Session, payload: CohortUpsertRequest) -> CohortRead:
+        if payload.semester not in (1, 2):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Semester must be 1 or 2",
+            )
+        
+        if payload.id is None:
             cohort = self.repository.create(db, payload)
         else:
             cohort = self._get_or_404(db, target_id)
