@@ -42,3 +42,15 @@ class UserRepository:
         self.db.commit()
         self.db.refresh(user)
         return user
+
+    def update(self, user: User, *, name: str, email: str, role: UserRole) -> User:
+        user.name = name
+        user.email = email
+        user.role = role
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def delete(self, user: User) -> None:
+        self.db.delete(user)
+        self.db.commit()
