@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ithaka-backend-config
+  namespace: ithaka-backend
+data:
+  CORS_ORIGINS: "https://ithaka-frontend.reto-ucu.net"
