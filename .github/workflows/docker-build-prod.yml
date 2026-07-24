@@ -1,10 +1,10 @@
 name: Docker build and security
 
 on:
-  push:
-    branches:
-      - "**"
   pull_request:
+    branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -29,7 +29,6 @@ jobs:
         uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
   build-scan-push:
@@ -96,13 +95,8 @@ jobs:
           echo "${ACR_IMAGE}:${GITHUB_SHA}"
           echo "${ACR_IMAGE}:latest"
 
-          docker tag \
-            "${LOCAL_IMAGE}" \
-            "${ACR_IMAGE}:${GITHUB_SHA}"
-
-          docker tag \
-            "${LOCAL_IMAGE}" \
-            "${ACR_IMAGE}:latest"
+          docker tag "${LOCAL_IMAGE}" "${ACR_IMAGE}:${GITHUB_SHA}"
+          docker tag "${LOCAL_IMAGE}" "${ACR_IMAGE}:latest"
 
           docker push "${ACR_IMAGE}:${GITHUB_SHA}"
           docker push "${ACR_IMAGE}:latest"
@@ -116,3 +110,131 @@ jobs:
         run: |
           echo "Image built and scanned successfully."
           echo "No push was performed because this is not a push to the default branch."
+
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: build-scan-push
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+    environment: production
+    steps:
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+
+      - name: Configure kubectl (token + API server)
+        env:
+          KUBE_API_SERVER: ${{ secrets.KUBE_API_SERVER }}
+          KUBE_TOKEN: ${{ secrets.KUBE_TOKEN }}
+          KUBE_CA_CERT: ${{ secrets.KUBE_CA_CERT }}
+        run: |
+          set -euo pipefail
+
+          # Con CA del cluster (recomendado, valida TLS):
+          if [ -n "${KUBE_CA_CERT}" ]; then
+            printf '%s' "$KUBE_CA_CERT" | base64 -d > "$RUNNER_TEMP/ca.crt"
+            kubectl config set-cluster reto-ucu \
+              --server="$KUBE_API_SERVER" \
+              --certificate-authority="$RUNNER_TEMP/ca.crt" \
+              --embed-certs=true
+          else
+            # Sin CA: saltea verificación TLS (menos seguro).
+            kubectl config set-cluster reto-ucu \
+              --server="$KUBE_API_SERVER" \
+              --insecure-skip-tls-verify=true
+          fi
+
+          kubectl config set-credentials ci-deployer --token="$KUBE_TOKEN"
+          kubectl config set-context reto-ucu \
+            --cluster=reto-ucu --user=ci-deployer --namespace=ithaka-backend
+          kubectl config use-context reto-ucu
+
+      - name: Update image and wait for rollout
+        env:
+          ACR_LOGIN_SERVER: ${{ vars.ACR_LOGIN_SERVER }}
+        run: |
+          set -euo pipefail
+          IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${GITHUB_SHA}"
+          echo "Deploying image: ${IMAGE}"
+
+          # backend (container) y migrate (initContainer) usan la MISMA imagen:
+          # hay que actualizar las dos, o el initContainer quedaría en la versión vieja.
+          kubectl set image deployment/ithaka-backend \
+            backend="$IMAGE" \
+            migrate="$IMAGE" \
+            -n ithaka-backend
+
+          kubectl rollout status deployment/ithaka-backend \
+            -n ithaka-backend --timeout=180s
+
+      - name: Rollback on failure
+        if: failure()
+        run: kubectl rollout undo deployment/ithaka-backend -n ithaka-backend || true
+
+      - name: Notify Discord - deploy OK
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          set -euo pipefail
+          curl -sf -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d @- <<JSON
+          {
+            "username": "CI/CD Ithaka",
+            "embeds": [{
+              "title": "✅ Deploy exitoso: ithaka-backend",
+              "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "color": 3066993,
+              "fields": [
+                { "name": "Repo",   "value": "${{ github.repository }}", "inline": true },
+                { "name": "Autor",  "value": "${{ github.actor }}",      "inline": true },
+                { "name": "Commit", "value": "${{ github.sha }}" },
+                { "name": "Rama",   "value": "${{ github.ref_name }}",   "inline": true }
+              ]
+            }]
+          }
+          JSON
+
+  notify-failure:
+    name: Notify Discord on pipeline failure
+    runs-on: ubuntu-latest
+    needs: [secret-scan, build-scan-push, deploy]
+    if: failure()
+
+    steps:
+      - name: Compute failed jobs
+        id: failed
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          FAILED=$(echo "$NEEDS_JSON" | jq -r 'to_entries
+            | map(select(.value.result == "failure") | .key)
+            | join(", ")')
+          echo "list=${FAILED:-desconocido}" >> "$GITHUB_OUTPUT"
+
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        run: |
+          set -euo pipefail
+          curl -sf -X POST "$DISCORD_WEBHOOK" \
+            -H "Content-Type: application/json" \
+            -d @- <<JSON
+          {
+            "username": "CI/CD Ithaka",
+            "embeds": [{
+              "title": "❌ Pipeline FALLÓ: ithaka-backend",
+              "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "color": 15158332,
+              "fields": [
+                { "name": "Job(s) que fallaron", "value": "${{ steps.failed.outputs.list }}" },
+                { "name": "Rama",   "value": "${{ github.ref_name }}", "inline": true },
+                { "name": "Autor",  "value": "${{ github.actor }}",    "inline": true },
+                { "name": "Commit", "value": "${{ github.sha }}" }
+              ]
+            }]
+          }
+          JSON
