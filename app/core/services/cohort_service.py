@@ -35,7 +35,7 @@ class CohortService:
         if payload.id is None:
             cohort = self.repository.create(db, payload)
         else:
-            cohort = self._get_or_404(db, payload.id)
+            cohort = self._get_or_404(db, target_id)
             cohort = self.repository.update(db, cohort, payload)
 
         return self._to_read(db, cohort)
@@ -64,3 +64,9 @@ class CohortService:
         return cohort_read.model_copy(
             update={"group_count": self.repository.count_groups(db, cohort.id)}
         )
+
+    @staticmethod
+    def _normalize_id(value: int | None) -> int | None:
+        if value is None or value <= 0:
+            return None
+        return value

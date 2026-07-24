@@ -1,0 +1,61 @@
+name: Discord notifications
+
+on:
+  issues:
+    types: [opened, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send filtered issue notification
+        env:
+          ACTION: ${{ github.event.action }}
+          REPOSITORY: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+          NUMBER: ${{ github.event.issue.number }}
+          TITLE: ${{ github.event.issue.title }}
+          HTML_URL: ${{ github.event.issue.html_url }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_ISSUE_WEBHOOK_URL }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.request
+
+          action = os.environ["ACTION"]
+          repository = os.environ["REPOSITORY"]
+          number = os.environ["NUMBER"]
+          title = os.environ["TITLE"][:240]
+          url = os.environ["HTML_URL"]
+          actor = os.environ["ACTOR"]
+          webhook_url = os.environ.get("DISCORD_WEBHOOK_URL", "")
+          if not webhook_url:
+              raise SystemExit("Discord issue webhook secret is not configured")
+
+          heading = "🆕 Nuevo issue" if action == "opened" else "✅ Issue cerrado"
+          color = 0x57F287 if action == "opened" else 0x95A5A6
+          payload = {
+              "username": "GitHub Reto",
+              "allowed_mentions": {"parse": []},
+              "embeds": [{
+                  "title": f"{heading}: #{number} — {title}",
+                  "url": url,
+                  "color": color,
+                  "description": f"**Repositorio:** `{repository}`\n**Autor:** `{actor}`",
+                  "footer": {"text": "Reto UCU · notificación automática"},
+              }],
+          }
+          request = urllib.request.Request(
+              webhook_url + "?wait=true",
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json", "User-Agent": "reto-discord-notifier"},
+              method="POST",
+          )
+          with urllib.request.urlopen(request, timeout=20) as response:
+              if response.status not in (200, 204):
+                  raise SystemExit(f"Discord returned HTTP {response.status}")
+          PY
