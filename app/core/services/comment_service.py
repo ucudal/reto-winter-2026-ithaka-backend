@@ -1,22 +1,24 @@
+from fastapi import HTTPException
+from sqlalchemy.orm import Session
+
+from app.core.models.comment import Comment
+from app.core.repositories.comment_repository import CommentRepository
+from app.core.schemas.comment import CommentCreateRequest
+
+
 class CommentService:
+
     def __init__(self):
-        self.db: Session = None  # Placeholder for the database session
+        self.repo = CommentRepository()
 
-    def set_db(self, db: Session):
-        self.db = db
+    def list_comments_by_deliverable(self, db: Session, deliverable_id: int) -> list[Comment]:
+        return self.repo.list_by_deliverable(db, deliverable_id)
 
-    def get_comments(self):
-        # Logic to retrieve comments from the database
-        pass
+    def create_comment(self, db: Session, deliverable_id: int, payload: CommentCreateRequest) -> Comment:
+        return self.repo.create(db, payload.tutor_id, deliverable_id, payload.content)
 
-    def create_comment(self, comment_data):
-        # Logic to create a new comment in the database
-        pass
-
-    def update_comment(self, comment_id, comment_data):
-        # Logic to update an existing comment in the database
-        pass
-
-    def delete_comment(self, comment_id):
-        # Logic to delete a comment from the database
-        pass
+    def delete_comment(self, db: Session, comment_id: int) -> None:
+        comment = self.repo.get_by_id(db, comment_id)
+        if comment is None:
+            raise HTTPException(status_code=404, detail=f"Comment {comment_id} not found")
+        self.repo.delete(db, comment)
