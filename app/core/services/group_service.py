@@ -8,6 +8,7 @@ from app.core.repositories.group_repository import GroupRepository
 from app.core.models.stage import Stage
 from app.core.models.student import Student
 from app.core.models.tutor import Tutor
+from app.core.models.enums import TutorRole
 from app.core.schemas.group import GroupUpsert, GroupResponse
 
 
@@ -30,9 +31,9 @@ class GroupService:
         self._ensure_cohort_exists(db, payload.cohort_id)
         self._ensure_students_exist(db, payload.student_ids)
         self._ensure_optional_fk_exists(db, Stage, payload.current_stage_id, "Stage not found")
-        self._ensure_optional_fk_exists(db, Tutor, payload.business_tutor_id, "Business tutor not found")
-        self._ensure_optional_fk_exists(db, Tutor, payload.technical_tutor_id, "Technical tutor not found")
-
+        self._ensure_tutor_type(db, payload.business_tutor_id, TutorRole.BUSINESS, "Business tutor not found",)
+        self._ensure_tutor_type(db, payload.technical_tutor_id, TutorRole.TECHNICAL, "Technical tutor not found",)
+        
         if target_id is None:
             group = self.repository.create(db, payload)
         else:
@@ -87,7 +88,25 @@ class GroupService:
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"{detail}: {value}",
             )
+            
+    def _ensure_tutor_type(self, db: Session, tutor_id: int | None, expected_role: TutorRole, detail: str,) -> None:
+        if tutor_id is None:
+            return
 
+        tutor = db.get(Tutor, tutor_id)
+
+        if tutor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"{detail}: {tutor_id}",
+            )
+
+        if tutor.role != expected_role:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Tutor {tutor_id} must be a {expected_role} tutor.",
+            )
+        
     def _ensure_students_exist(self, db: Session, student_ids: list[int]) -> None:
         if len(student_ids) == 0:
             raise HTTPException(
@@ -107,3 +126,4 @@ class GroupService:
         if value is None or value <= 0:
             return None
         return value
+
