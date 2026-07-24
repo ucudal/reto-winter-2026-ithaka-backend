@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.models.tutor import Tutor
 from app.core.models.group import Group
 from app.core.models.meeting import Meeting
+from app.core.schemas.tutor import TutorUpsertRequest
 
 
 class TutorRepository:
@@ -16,10 +17,19 @@ class TutorRepository:
 
     def get_by_id(self, db: Session, tutor_id: int) -> Tutor | None:
         return db.get(Tutor, tutor_id)
+    
+    def create(self, db: Session, payload: TutorUpsertRequest) -> Tutor:
+        tutor = Tutor(**payload.model_dump(exclude={"id"}))
 
-    def update(self, db: Session, tutor: Tutor, **fields) -> Tutor:
-        for field, value in fields.items():
+        db.add(tutor)
+        db.commit()
+        db.refresh(tutor)
+        return tutor
+
+    def update(self, db: Session, tutor: Tutor, payload: TutorUpsertRequest) -> Tutor:
+        for field, value in payload.model_dump(exclude={"id"}).items():
             setattr(tutor, field, value)
+
         db.commit()
         db.refresh(tutor)
         return tutor
