@@ -166,7 +166,7 @@ jobs:
             -n ithaka-backend
 
           kubectl rollout status deployment/ithaka-backend \
-            -n ithaka-backend --timeout=180s
+            -n ithaka-backend --timeout=300s
 
       - name: Rollback on failure
         if: failure()
