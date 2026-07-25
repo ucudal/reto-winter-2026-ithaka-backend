@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from app.core.schemas.tutor import TutorRead
 from app.core.schemas.stage import StageRead
 from app.core.schemas.student import StudentRead
+from app.core.schemas.cohort import CohortRead
 
 
 class GroupUpsert(BaseModel):
@@ -30,6 +31,7 @@ class GroupResponse(BaseModel):
     technical_tutor: TutorRead | None = None
     current_stage: StageRead | None = None
     students: list[StudentRead] = []
+    cohort: CohortRead | None = None
 
     class Config:
         from_attributes = True

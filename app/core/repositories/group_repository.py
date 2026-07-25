@@ -17,6 +17,7 @@ class GroupRepository:
                 joinedload(Group.business_tutor),
                 joinedload(Group.technical_tutor),
                 joinedload(Group.current_stage),
+                joinedload(Group.cohort),
                 selectinload(Group.students)
             )
             .order_by(Group.name.asc(), Group.id.asc())
@@ -30,6 +31,7 @@ class GroupRepository:
                 joinedload(Group.business_tutor),
                 joinedload(Group.technical_tutor),
                 joinedload(Group.current_stage),
+                joinedload(Group.cohort),
                 selectinload(Group.students)
             )
             .where(Group.id == group_id)
