@@ -6,6 +6,8 @@ class StudentBase(BaseModel):
     email: EmailStr
     major: str | None = None
     group_id: int | None = None 
+    is_graduation_project: bool = False
+    linkedin_url: str | None = None
 
 
 class StudentUpsert(StudentBase):
@@ -14,6 +16,8 @@ class StudentUpsert(StudentBase):
     email: EmailStr
     major: str | None = None
     group_id: int | None = None
+    is_graduation_project: bool = False
+    linkedin_url: str | None = None
 
 
 class StudentRead(StudentBase):
@@ -22,5 +26,7 @@ class StudentRead(StudentBase):
     email: EmailStr
     major: str | None = None
     group_id: int | None = None
+    is_graduation_project: bool = False
+    linkedin_url: str | None = None
 
     model_config = ConfigDict(from_attributes=True)

@@ -99,7 +99,8 @@ def seed_database(force: bool = False):
             specialty="Modelos de Negocio SaaS & Finanzas",
             max_capacity=60,
             availability="Lunes y Miércoles 14:00 - 18:00",
-            status="Active"
+            status="Active",
+            linkedin_url="https://www.linkedin.com/in/maria-perez-ithaka"
         )
         tutor_t1 = Tutor(
             user_id=u_tut2.id,
@@ -108,7 +109,8 @@ def seed_database(force: bool = False):
             specialty="Arquitectura Cloud & Desarrollos Web/Mobile",
             max_capacity=40,
             availability="Martes y Jueves 09:00 - 13:00",
-            status="Active"
+            status="Active",
+            linkedin_url="https://www.linkedin.com/in/diego-ramirez-ithaka"
         )
         tutor_b2 = Tutor(
             user_id=u_tut3.id,
@@ -117,7 +119,8 @@ def seed_database(force: bool = False):
             specialty="Marketing Digital & Validación de Mercado",
             max_capacity=50,
             availability="Viernes 10:00 - 16:00",
-            status="Active"
+            status="Active",
+            linkedin_url="https://www.linkedin.com/in/lucia-gomez-ithaka"
         )
         db.add_all([tutor_b1, tutor_t1, tutor_b2])
         db.flush()
@@ -149,10 +152,10 @@ def seed_database(force: bool = False):
 
         # 6. Crear Estudiantes
         print("- Creando Estudiantes...")
-        std_1 = Student(user_id=u_std1.id, name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=group_1.id)
-        std_2 = Student(user_id=u_std2.id, name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=group_1.id)
-        std_3 = Student(name="Mateo Silva", email="mateo.silva@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=group_2.id)
-        std_4 = Student(name="Camila Torres", email="camila.torres@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=group_2.id)
+        std_1 = Student(user_id=u_std1.id, name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=group_1.id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/ana-fernandez")
+        std_2 = Student(user_id=u_std2.id, name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=group_1.id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/luca-rossi")
+        std_3 = Student(name="Mateo Silva", email="mateo.silva@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=group_2.id, is_graduation_project=True, linkedin_url=None)
+        std_4 = Student(name="Camila Torres", email="camila.torres@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=group_2.id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/camila-torres")
         db.add_all([std_1, std_2, std_3, std_4])
         db.flush()
 
