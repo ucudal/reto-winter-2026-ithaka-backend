@@ -39,3 +39,8 @@ class GroupResponse(BaseModel):
 
 class GroupStageUpdate(BaseModel):
     stage_id: int
+
+
+class GroupTutorsUpdate(BaseModel):
+    business_tutor_id: int | None = None
+    technical_tutor_id: int | None = None

@@ -67,6 +67,19 @@ class GroupRepository:
         db.refresh(group)
         return group
 
+    def update_tutors(
+        self,
+        db: Session,
+        group: Group,
+        business_tutor_id: int | None,
+        technical_tutor_id: int | None,
+    ) -> Group:
+        group.business_tutor_id = business_tutor_id
+        group.technical_tutor_id = technical_tutor_id
+        db.commit()
+        db.refresh(group)
+        return group
+
     def _sync_id_sequence(self, db: Session) -> None:
         sequence_name = db.scalar(text("SELECT pg_get_serial_sequence('groups', 'id')"))
         if sequence_name is None:

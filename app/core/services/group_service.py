@@ -48,7 +48,21 @@ class GroupService:
 
     def change_stage(self, db: Session, group_id: int, new_stage_id: int) -> GroupResponse:
         group = self._get_or_404(db, group_id)
+        self._ensure_optional_fk_exists(db, Stage, new_stage_id, "Stage not found")
         group = self.repository.change_stage(db, group, new_stage_id)
+        return GroupResponse.model_validate(group, from_attributes=True)
+
+    def update_tutors(
+        self,
+        db: Session,
+        group_id: int,
+        business_tutor_id: int | None,
+        technical_tutor_id: int | None,
+    ) -> GroupResponse:
+        group = self._get_or_404(db, group_id)
+        self._ensure_tutor_type(db, business_tutor_id, TutorRole.BUSINESS, "Business tutor not found")
+        self._ensure_tutor_type(db, technical_tutor_id, TutorRole.TECHNICAL, "Technical tutor not found")
+        group = self.repository.update_tutors(db, group, business_tutor_id, technical_tutor_id)
         return GroupResponse.model_validate(group, from_attributes=True)
 
     def get_group_students(self, db: Session, group_id: int) -> list:
