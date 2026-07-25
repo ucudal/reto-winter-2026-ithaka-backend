@@ -22,12 +22,9 @@ class GroupResponse(BaseModel):
     id: int
     name: str
     cohort_id: int
-    current_stage_id: int | None
     idea: str | None
     major: str | None
     status: str
-    business_tutor_id: int | None
-    technical_tutor_id: int | None
 
     business_tutor: TutorRead | None = None
     technical_tutor: TutorRead | None = None
