@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy import select, text
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.core.models.group import Group
 from app.core.models.student import Student
@@ -11,11 +11,30 @@ from app.core.schemas.group import GroupUpsert
 class GroupRepository:
 
     def list(self, db: Session) -> list[Group]:
-        statement = select(Group).order_by(Group.name.asc(), Group.id.asc())
+        statement = (
+            select(Group)
+            .options(
+                joinedload(Group.business_tutor),
+                joinedload(Group.technical_tutor),
+                joinedload(Group.current_stage),
+                selectinload(Group.students)
+            )
+            .order_by(Group.name.asc(), Group.id.asc())
+        )
         return list(db.scalars(statement).all())
 
     def get_by_id(self, db: Session, group_id: int) -> Group | None:
-        return db.get(Group, group_id)
+        statement = (
+            select(Group)
+            .options(
+                joinedload(Group.business_tutor),
+                joinedload(Group.technical_tutor),
+                joinedload(Group.current_stage),
+                selectinload(Group.students)
+            )
+            .where(Group.id == group_id)
+        )
+        return db.scalars(statement).first()
 
     def create(self, db: Session, payload: GroupUpsert) -> Group:
         group = Group(**payload.model_dump(exclude={"id", "student_ids"}))

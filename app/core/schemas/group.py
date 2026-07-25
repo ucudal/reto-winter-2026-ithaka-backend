@@ -1,4 +1,8 @@
+from __future__ import annotations
 from pydantic import BaseModel
+from app.core.schemas.tutor import TutorRead
+from app.core.schemas.stage import StageRead
+from app.core.schemas.student import StudentRead
 
 
 class GroupUpsert(BaseModel):
@@ -24,6 +28,11 @@ class GroupResponse(BaseModel):
     status: str
     business_tutor_id: int | None
     technical_tutor_id: int | None
+
+    business_tutor: TutorRead | None = None
+    technical_tutor: TutorRead | None = None
+    current_stage: StageRead | None = None
+    students: list[StudentRead] = []
 
     class Config:
         from_attributes = True
