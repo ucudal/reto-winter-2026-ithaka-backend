@@ -14,21 +14,21 @@ service = TutorService()
 
 @router.get("", response_model=list[TutorRead])
 def list_tutors(
-    _: User = Depends(require_roles(UserRole.COORDINATOR)),
+    #_: User = Depends(require_roles(UserRole.COORDINATOR)),
     db: Session = Depends(get_db)):
     return service.list_tutors(db)
 
 
 @router.get("/overloaded", response_model=list[TutorCapacityRead])
 def list_overloaded_tutors(
-    _: User = Depends(require_roles(UserRole.COORDINATOR)),
+    #_: User = Depends(require_roles(UserRole.COORDINATOR)),
     db: Session = Depends(get_db)):
     return service.list_overloaded(db)
 
 
 @router.get("/{id}", response_model=TutorRead)
 def get_tutor(
-    _: User = Depends(require_roles(UserRole.COORDINATOR)),
+    #_: User = Depends(require_roles(UserRole.COORDINATOR)),
     id: int = None,
     db: Session = Depends(get_db)
 ):
@@ -38,7 +38,7 @@ def get_tutor(
 @router.put("", response_model=TutorRead)
 def upsert_tutor(
     payload: TutorUpsertRequest,
-    _: User = Depends(require_roles(UserRole.COORDINATOR)),
+    #_: User = Depends(require_roles(UserRole.COORDINATOR)),
     db: Session = Depends(get_db),
 ):
     return service.upsert_tutor(db, payload)

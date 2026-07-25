@@ -48,13 +48,15 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
 
 
 def create_access_token(
-    subject: str, expires_delta: timedelta | None = None
+    subject: User, extra_claim: dict, expires_delta: timedelta | None = None
 ) -> str:
     """Crea un JWT firmado cuyo claim `sub` identifica al usuario."""
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     payload = {"sub": subject, "exp": expire}
+    if extra_claim:
+        payload.update(extra_claim)
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 
