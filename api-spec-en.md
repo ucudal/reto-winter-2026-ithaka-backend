@@ -413,7 +413,37 @@ POST   /api/users
   "user": {
     "id": 8,
     "name": "María Pérez",
-    "role": "BusinessTutor"
+    "role": "BusinessTutor",
+    "student": null,
+    "tutor": {
+      "id": 1,
+      "user_id": 8,
+      "name": "María Pérez",
+      "role": "Business",
+      "specialty": "Modelos de Negocio SaaS & Finanzas",
+      "max_capacity": 60,
+      "availability": "Lunes y Miércoles 14:00 - 18:00",
+      "status": "Active"
+    }
+  }
+}
+
+// response (student example)
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": 23,
+    "name": "Ana Fernández",
+    "role": "Student",
+    "student": {
+      "id": 13,
+      "user_id": 23,
+      "name": "Ana Fernández",
+      "email": "ana.fernandez@correo.ucu.edu.uy",
+      "major": "Ingeniería en Informática",
+      "group_id": 9
+    },
+    "tutor": null
   }
 }
 ```
