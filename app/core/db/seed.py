@@ -57,7 +57,23 @@ def seed_database(force: bool = False):
             status="Active",
             notes="Cohorte Otoño 2026 - Enfoque Sostenibilidad y GovTech"
         )
-        db.add(cohort_2026_1)
+        cohort_2025_2 = Cohort(
+            year=2025,
+            semester=2,
+            start_date=date(2025, 8, 1),
+            end_date=date(2025, 12, 20),
+            status="Finished",
+            notes="Cohorte Primavera 2025 - FinTech & Health"
+        )
+        cohort_2026_2 = Cohort(
+            year=2026,
+            semester=2,
+            start_date=date(2026, 8, 1),
+            end_date=date(2026, 12, 20),
+            status="Planned",
+            notes="Cohorte Primavera 2026 - AI & Robotics"
+        )
+        db.add_all([cohort_2026_1, cohort_2025_2, cohort_2026_2])
         db.flush()
 
         # 3. Crear Etapas
@@ -147,7 +163,17 @@ def seed_database(force: bool = False):
             business_tutor_id=tutor_b2.id,
             technical_tutor_id=tutor_t1.id
         )
-        db.add_all([group_1, group_2])
+        group_3 = Group(
+            name="AgroSmart",
+            cohort_id=cohort_2026_1.id,
+            current_stage_id=stage_3.id,
+            idea="Sensores inteligentes para optimizar el riego en cultivos agrícolas extensivos.",
+            major="Ingeniería Industrial",
+            status="Active",
+            business_tutor_id=tutor_b1.id,
+            technical_tutor_id=tutor_t1.id
+        )
+        db.add_all([group_1, group_2, group_3])
         db.flush()
 
         # 6. Crear Estudiantes
@@ -156,7 +182,8 @@ def seed_database(force: bool = False):
         std_2 = Student(user_id=u_std2.id, name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=group_1.id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/luca-rossi")
         std_3 = Student(name="Mateo Silva", email="mateo.silva@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=group_2.id, is_graduation_project=True, linkedin_url=None)
         std_4 = Student(name="Camila Torres", email="camila.torres@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=group_2.id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/camila-torres")
-        db.add_all([std_1, std_2, std_3, std_4])
+        std_5 = Student(name="Joaquín Olivera", email="joaquin.olivera@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=group_3.id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/joaquin-olivera")
+        db.add_all([std_1, std_2, std_3, std_4, std_5])
         db.flush()
 
         # 7. Crear Entregables
@@ -164,7 +191,8 @@ def seed_database(force: bool = False):
         deliv_1 = Deliverable(group_id=group_1.id, stage_id=stage_1.id, expected_date=date(2026, 3, 30), status="Approved")
         deliv_2 = Deliverable(group_id=group_1.id, stage_id=stage_2.id, expected_date=date(2026, 4, 20), status="Pending")
         deliv_3 = Deliverable(group_id=group_2.id, stage_id=stage_1.id, expected_date=date(2026, 3, 30), status="Pending")
-        db.add_all([deliv_1, deliv_2, deliv_3])
+        deliv_4 = Deliverable(group_id=group_3.id, stage_id=stage_3.id, expected_date=date(2026, 6, 10), status="Approved")
+        db.add_all([deliv_1, deliv_2, deliv_3, deliv_4])
         db.flush()
 
         # 8. Crear Reuniones
@@ -179,25 +207,49 @@ def seed_database(force: bool = False):
             hours_spent=2.5,
             links=[{"type": "Drive", "url": "https://drive.google.com/ecoroute-minuta-1"}]
         )
-        db.add(meet_1)
+        meet_2 = Meeting(
+            group_id=group_2.id,
+            tutor_ids=[tutor_b2.id],
+            date=datetime(2026, 4, 12, 10, 0, tzinfo=timezone.utc),
+            participants=[std_3.id, std_4.id],
+            notes="Revisión de hipótesis de clientes y mapa de empatía.",
+            next_steps="Realizar 5 entrevistas adicionales a familiares de adultos mayores.",
+            hours_spent=1.5,
+            links=[{"type": "Drive", "url": "https://drive.google.com/healthpulse-minuta-1"}]
+        )
+        meet_3 = Meeting(
+            group_id=group_3.id,
+            tutor_ids=[tutor_t1.id],
+            date=datetime(2026, 4, 15, 16, 0, tzinfo=timezone.utc),
+            participants=[std_5.id],
+            notes="Evaluación de hardware de sensores e integración con LoRaWAN.",
+            next_steps="Comprar módulo de prueba LoRa y validar consumo de batería.",
+            hours_spent=2.0,
+            links=[{"type": "Drive", "url": "https://drive.google.com/agrosmart-minuta-1"}]
+        )
+        db.add_all([meet_1, meet_2, meet_3])
 
         # 9. Crear Materiales de Apoyo
         print("- Creando Materiales de Apoyo...")
         mat_1 = SupportMaterial(stage_id=stage_1.id, title="Plantilla de Mapa de Empatía", url="https://drive.google.com/template-empatia")
         mat_2 = SupportMaterial(stage_id=stage_2.id, title="Business Model Canvas Template", url="https://drive.google.com/template-bmc")
-        db.add_all([mat_1, mat_2])
+        mat_3 = SupportMaterial(stage_id=stage_3.id, title="Guía de Pruebas de Usuario y MVP", url="https://drive.google.com/guia-mvp")
+        db.add_all([mat_1, mat_2, mat_3])
         db.flush()
 
         # 10. Crear Documentos Polimórficos
         print("- Creando Documentos Polimórficos...")
         doc_group = Document(entity_type=EntityType.GROUP, entity_id=group_1.id, url="https://drive.google.com/ecoroute-repo-general", platform=DocumentPlatform.DRIVE, order=1)
         doc_deliv = Document(entity_type=EntityType.DELIVERABLE, entity_id=deliv_1.id, url="https://sharepoint.com/ecoroute-reporte-validacion", platform=DocumentPlatform.SHAREPOINT, order=1)
-        db.add_all([doc_group, doc_deliv])
+        doc_group_2 = Document(entity_type=EntityType.GROUP, entity_id=group_2.id, url="https://drive.google.com/healthpulse-pitch", platform=DocumentPlatform.DRIVE, order=2)
+        db.add_all([doc_group, doc_deliv, doc_group_2])
 
         # 11. Crear Comentarios
         print("- Creando Comentarios...")
         comm_1 = Comment(tutor_id=tutor_b1.id, deliverable_id=deliv_1.id, content="Excelente trabajo en las entrevistas de validación. La muestra de 20 empresas fue muy representativa.")
-        db.add(comm_1)
+        comm_2 = Comment(tutor_id=tutor_b2.id, deliverable_id=deliv_3.id, content="Recuerden profundizar en los pain points de las instituciones de salud.")
+        comm_3 = Comment(tutor_id=tutor_t1.id, deliverable_id=deliv_4.id, content="Prototipo probado en campo con resultados prometedores de batería.")
+        db.add_all([comm_1, comm_2, comm_3])
 
         db.commit()
         print("¡Seeder ejecutado con éxito! Base de datos poblada.")
