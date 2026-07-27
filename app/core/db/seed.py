@@ -7,6 +7,7 @@ from app.core.models import (
     Deliverable, Meeting, SupportMaterial, Document, Comment
 )
 from app.core.models.enums import UserRole, TutorRole, DocumentPlatform, EntityType
+from app.core.models.meeting import MeetingStatus
 from app.core.security import hash_password
 
 
@@ -43,7 +44,7 @@ def seed_database(force: bool = False):
         u_tut3 = User(name="Lucía Gómez", email="lucia.gomez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash)
         u_std1 = User(name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash)
         u_std2 = User(name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash)
-        
+
         db.add_all([u_coord, u_tut1, u_tut2, u_tut3, u_std1, u_std2])
         db.flush()
 
@@ -200,8 +201,13 @@ def seed_database(force: bool = False):
         meet_1 = Meeting(
             group_id=group_1.id,
             tutor_ids=[tutor_b1.id, tutor_t1.id],
+            status=MeetingStatus.HELD,
             date=datetime(2026, 4, 10, 15, 0, tzinfo=timezone.utc),
-            participants=[std_1.id, std_2.id],
+            participants=[
+                {"student_id": std_1.id, "attended": True},
+                {"student_id": std_2.id, "attended": True},
+            ],
+            summary="Reunión de seguimiento sobre propuesta de valor y factibilidad técnica.",
             notes="Se discutió la propuesta de valor y la factibilidad técnica del algoritmo de ruteo.",
             next_steps="Ajustar BMC para segmento B2B y armar prototipo de arquitectura en AWS.",
             hours_spent=2.5,
@@ -210,8 +216,13 @@ def seed_database(force: bool = False):
         meet_2 = Meeting(
             group_id=group_2.id,
             tutor_ids=[tutor_b2.id],
+            status=MeetingStatus.HELD,
             date=datetime(2026, 4, 12, 10, 0, tzinfo=timezone.utc),
-            participants=[std_3.id, std_4.id],
+            participants=[
+                {"student_id": std_3.id, "attended": True},
+                {"student_id": std_4.id, "attended": False},
+            ],
+            summary="Revisión de hipótesis de clientes y mapa de empatía.",
             notes="Revisión de hipótesis de clientes y mapa de empatía.",
             next_steps="Realizar 5 entrevistas adicionales a familiares de adultos mayores.",
             hours_spent=1.5,
@@ -220,8 +231,12 @@ def seed_database(force: bool = False):
         meet_3 = Meeting(
             group_id=group_3.id,
             tutor_ids=[tutor_t1.id],
+            status=MeetingStatus.SCHEDULED,
             date=datetime(2026, 4, 15, 16, 0, tzinfo=timezone.utc),
-            participants=[std_5.id],
+            participants=[
+                {"student_id": std_5.id, "attended": False},
+            ],
+            summary=None,
             notes="Evaluación de hardware de sensores e integración con LoRaWAN.",
             next_steps="Comprar módulo de prueba LoRa y validar consumo de batería.",
             hours_spent=2.0,
