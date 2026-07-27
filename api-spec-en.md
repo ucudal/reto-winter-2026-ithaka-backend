@@ -10,10 +10,10 @@
 **Group** — `id`, `name`, `cohort_id` → Cohort, `current_stage_id` → Stage *(nullable)*, `idea` *(nullable)*, `major` *(nullable)*, `status` *(default: "Active")*, `business_tutor_id` → Tutor *(nullable)*, `technical_tutor_id` → Tutor *(nullable)*
 → relationships: `cohort`, `current_stage`, `students`, `meetings`, `deliverables`, `business_tutor`, `technical_tutor`, `documents`
 
-**Student** — `id`, `user_id` → User *(nullable)*, `name`, `email` *(unique)*, `major` *(nullable)*, `group_id` → Group *(nullable)*
+**Student** — `id`, `user_id` → User *(nullable)*, `name`, `email` *(unique)*, `major` *(nullable)*, `group_id` → Group *(nullable)*, `is_graduation_project` *(default: false)*, `linkedin_url` *(nullable)*
 → relationships: `user`, `group`
 
-**Tutor** — `id`, `user_id` → User *(nullable)*, `name`, `role` *(enum: Business | Technical)*, `specialty` *(nullable)*, `max_capacity` *(default: 0)*, `availability` *(nullable)*, `status` *(default: "Active")*
+**Tutor** — `id`, `user_id` → User *(nullable)*, `name`, `role` *(enum: Business | Technical)*, `specialty` *(nullable)*, `max_capacity` *(default: 0)*, `availability` *(nullable)*, `status` *(default: "Active")*, `linkedin_url` *(nullable)*
 → relationships: `user`, `groups_as_business_tutor`, `groups_as_technical_tutor`, `meetings`, `comments`
 
 **Stage** — `id`, `cohort_id` → Cohort, `name`, `order`, `key_dates` *(JSONB, nullable — list of `{description, date}`)*
@@ -55,7 +55,7 @@
 # Cohorts
 GET    /api/cohorts
 GET    /api/cohorts/{id}
-PUT    /api/cohorts/{id}
+PUT    /api/cohorts
 GET    /api/cohorts/{id}/groups
 GET    /api/cohorts/{id}/stages
 
@@ -151,8 +151,9 @@ POST   /api/users
   "group_count": 12
 }
 
-// PUT /api/cohorts/{id} (request)
+// PUT /api/cohorts (request)
 {
+  "id": 1,
   "year": 2026,
   "semester": 1,
   "start_date": "2026-03-01",
@@ -207,7 +208,9 @@ POST   /api/users
   "name": "Ana Fernández",
   "email": "ana.fernandez@ucu.edu.uy",
   "major": "Systems Engineering",
-  "group_id": 45
+  "group_id": 45,
+  "is_graduation_project": true,
+  "linkedin_url": "https://www.linkedin.com/in/ana-fernandez"
 }
 
 // PUT /api/students/{id} (request)
@@ -215,7 +218,9 @@ POST   /api/users
   "name": "Ana Fernández",
   "email": "ana.fernandez@ucu.edu.uy",
   "major": "Systems Engineering",
-  "group_id": 45
+  "group_id": 45,
+  "is_graduation_project": true,
+  "linkedin_url": "https://www.linkedin.com/in/ana-fernandez"
 }
 ```
 
@@ -229,7 +234,8 @@ POST   /api/users
   "specialty": "Strategy and market validation",
   "availability": "Monday and Wednesday afternoon",
   "max_capacity": 88,
-  "status": "Active"
+  "status": "Active",
+  "linkedin_url": "https://www.linkedin.com/in/maria-perez-ithaka"
 }
 
 // GET /api/tutors/{id}/capacity
@@ -412,7 +418,37 @@ POST   /api/users
   "user": {
     "id": 8,
     "name": "María Pérez",
-    "role": "BusinessTutor"
+    "role": "BusinessTutor",
+    "student": null,
+    "tutor": {
+      "id": 1,
+      "user_id": 8,
+      "name": "María Pérez",
+      "role": "Business",
+      "specialty": "Modelos de Negocio SaaS & Finanzas",
+      "max_capacity": 60,
+      "availability": "Lunes y Miércoles 14:00 - 18:00",
+      "status": "Active"
+    }
+  }
+}
+
+// response (student example)
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": 23,
+    "name": "Ana Fernández",
+    "role": "Student",
+    "student": {
+      "id": 13,
+      "user_id": 23,
+      "name": "Ana Fernández",
+      "email": "ana.fernandez@correo.ucu.edu.uy",
+      "major": "Ingeniería en Informática",
+      "group_id": 9
+    },
+    "tutor": null
   }
 }
 ```

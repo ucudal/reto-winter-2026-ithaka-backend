@@ -7,3 +7,14 @@
 # Python
 __pycache__/
 *.py[cod]
+
+# Kubernetes Secrets con valores reales (NO commitear; usar los .example)
+k8s/secret.yaml
+k8s/postgres-secret.yaml
+
+# SonarQube (scanner) y reportes de cobertura
+.scannerwork/
+coverage.xml
+.coverage
+htmlcov/
+.pytest_cache/

@@ -15,15 +15,18 @@ class TutorRead(BaseModel):
     max_capacity: int
     availability: str | None
     status: str
+    linkedin_url: str | None = None
 
 
-class TutorUpdateRequest(BaseModel):
+class TutorUpsertRequest(BaseModel):
+    id: int | None = None
     name: str
     role: TutorRole
     specialty: str | None = None
     max_capacity: int
     availability: str | None = None
     status: str = "Active"
+    linkedin_url: str | None = None
 
 
 class TutorGroupRead(BaseModel):
