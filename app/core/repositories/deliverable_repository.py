@@ -28,6 +28,16 @@ def get_deliverables_by_status(db: Session, status: str) -> list[Deliverable]:
     return list(db.scalars(select(Deliverable).where(Deliverable.status == status)))
 
 
+def get_deliverables_by_group(db: Session, group_id: int) -> list[Deliverable]:
+    return list(
+        db.scalars(
+            select(Deliverable)
+            .where(Deliverable.group_id == group_id)
+            .order_by(Deliverable.expected_date.asc())
+        )
+    )
+
+
 def get_overdue_deliverables(db: Session, today: date, status: str = "Pending") -> list[Deliverable]:
     return list(
         db.scalars(

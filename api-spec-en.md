@@ -383,6 +383,8 @@ POST   /api/users
 // GET /api/dashboard/summary
 // "GroupWithoutTutor" = business_tutor_id o technical_tutor_id es NULL.
 // "OverloadedTutor" = suma de horas de meetings > max_capacity del tutor.
+// "OverdueDeliverable" = expected_date < hoy y status no está en (Delivered, Approved).
+// "StaleGroup" = sin reuniones registradas, o la última reunión fue hace más de 14 días.
 {
   "active_groups": 42,
   "active_tutors": 18,
@@ -390,6 +392,13 @@ POST   /api/users
     { "stage": "Ideation", "count": 15 },
     { "stage": "Preliminary Project", "count": 18 },
     { "stage": "Final Project", "count": 9 }
+  ],
+  "groups_by_cohort": [
+    { "cohort": "2026-S1", "count": 24 },
+    { "cohort": "2026-S2", "count": 18 }
+  ],
+  "hours_by_group": [
+    { "group_id": 12, "group_name": "Grupo 1", "hours_used": 9.5 }
   ],
   "capacity": {
     "total_available_hours": 440,
@@ -399,7 +408,9 @@ POST   /api/users
   "pending_deliverables": 23,
   "alerts": [
     { "type": "GroupWithoutTutor", "group_id": 60, "description": "Missing technical tutor" },
-    { "type": "OverloadedTutor", "tutor_id": 8, "description": "104% of capacity" }
+    { "type": "OverloadedTutor", "tutor_id": 8, "description": "104% of capacity" },
+    { "type": "OverdueDeliverable", "group_id": 60, "description": "Entregable vencido desde 2026-07-01" },
+    { "type": "StaleGroup", "group_id": 61, "description": "Sin reuniones hace 20 días" }
   ]
 }
 ```

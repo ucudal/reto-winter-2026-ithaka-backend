@@ -8,6 +8,7 @@ from app.core.schemas.group import (
     GroupStageUpdate,
     GroupTutorsUpdate,
 )
+from app.core.schemas.deliverable_scheme import DeliverableRead
 from app.core.services.group_service import GroupService
 
 router = APIRouter(prefix="/api/groups", tags=["groups"])
@@ -89,7 +90,7 @@ def get_group_meetings(
     return service.get_group_meetings(db, group_id)
 
 
-@router.get("/{group_id}/deliverables")
+@router.get("/{group_id}/deliverables", response_model=list[DeliverableRead])
 def get_group_deliverables(
     group_id: int,
     db: Session = Depends(get_db),

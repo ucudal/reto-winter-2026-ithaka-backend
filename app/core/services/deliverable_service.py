@@ -11,7 +11,7 @@ from app.core.db.session import get_db
 from app.core.repositories import deliverable_repository
 from app.core.schemas.deliverable_scheme import DeliverableRead, DeliverableUpdate
 
-VALID_STATUSES = {"Pending", "Submitted", "Late"}
+VALID_STATUSES = {"Pending", "Submitted", "Delivered", "Approved", "Rejected"}
 
 
 class DeliverableService:

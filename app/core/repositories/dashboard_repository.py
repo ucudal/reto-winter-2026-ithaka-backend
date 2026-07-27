@@ -1,11 +1,16 @@
-from sqlalchemy import func
-from sqlalchemy.orm import Session
+from datetime import date
 
+from sqlalchemy import func
+from sqlalchemy.orm import Session, joinedload
+
+from app.core.models.cohort import Cohort
 from app.core.models.deliverable import Deliverable
 from app.core.models.group import Group
 from app.core.models.meeting import Meeting
 from app.core.models.stage import Stage
 from app.core.models.tutor import Tutor
+
+DELIVERABLE_DONE_STATUSES = ("Delivered", "Approved")
 
 
 class DashboardRepository:
@@ -13,7 +18,12 @@ class DashboardRepository:
         self.db = db
 
     def get_active_groups(self) -> list[Group]:
-        return self.db.query(Group).filter(Group.status == "Active").all()
+        return (
+            self.db.query(Group)
+            .options(joinedload(Group.current_stage))
+            .filter(Group.status == "Active")
+            .all()
+        )
 
     def get_active_tutors(self) -> list[Tutor]:
         return self.db.query(Tutor).filter(Tutor.status == "Active").all()
@@ -39,3 +49,24 @@ class DashboardRepository:
         if not group_ids:
             return []
         return self.db.query(Meeting).filter(Meeting.group_id.in_(group_ids)).all()
+
+    def get_groups_by_cohort(self) -> list[tuple[int, int, int]]:
+        return (
+            self.db.query(Cohort.year, Cohort.semester, func.count(Group.id))
+            .join(Group, Group.cohort_id == Cohort.id)
+            .filter(Group.status == "Active")
+            .group_by(Cohort.id, Cohort.year, Cohort.semester)
+            .order_by(Cohort.year, Cohort.semester)
+            .all()
+        )
+
+    def get_overdue_deliverables(self, group_ids: list[int]) -> list[Deliverable]:
+        if not group_ids:
+            return []
+        return (
+            self.db.query(Deliverable)
+            .filter(Deliverable.group_id.in_(group_ids))
+            .filter(Deliverable.expected_date < date.today())
+            .filter(Deliverable.status.notin_(DELIVERABLE_DONE_STATUSES))
+            .all()
+        )
