@@ -3,7 +3,7 @@ name: Notify Discord on PR opened
 on:
   pull_request:
     types: [opened, reopened, ready_for_review]
-    branches: [main]
+    branches: [main, testing]
 
 permissions:
   contents: read
