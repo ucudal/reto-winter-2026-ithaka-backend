@@ -23,6 +23,7 @@ from app.core.repositories.user_repository import UserRepository
 # cuando falta el header Authorization.
 bearer_scheme = HTTPBearer(auto_error=False)
 
+
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
@@ -95,3 +96,18 @@ def require_roles(*roles: UserRole):
         return current_user
 
     return dependency
+
+
+def require_coordinator():
+    return require_roles(UserRole.COORDINATOR)
+
+
+def require_tutor_or_coordinator():
+    return require_roles(
+        UserRole.COORDINATOR,
+        UserRole.BUSINESS_TUTOR,
+        UserRole.TECHNICAL_TUTOR,
+)
+
+def require_authenticated():
+    return get_current_user
