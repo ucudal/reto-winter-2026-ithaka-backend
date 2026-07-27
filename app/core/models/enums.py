@@ -23,3 +23,12 @@ class EntityType(str, Enum):
     MEETING = "Meeting"
     DELIVERABLE = "Deliverable"
     SUPPORT_MATERIAL = "SupportMaterial"
+
+class CheckpointStatus(str, Enum):
+    OPEN = "Open"
+    CLOSED = "Closed"
+
+
+class RespondentType(str, Enum):
+    TUTOR = "Tutor"
+    STUDENT = "Student"

@@ -12,6 +12,8 @@ from app.core.models.student import Student
 from app.core.models.support_material import SupportMaterial
 from app.core.models.tutor import Tutor
 from app.core.models.user import User
+from app.core.models.checkpoint import Checkpoint
+from app.core.models.checkpoint_response import CheckpointResponse
 
 __all__ = [
     "Base",
@@ -26,4 +28,6 @@ __all__ = [
     "SupportMaterial",
     "Tutor",
     "User",
+    "Checkpoint",
+    "CheckpointResponse"
 ]

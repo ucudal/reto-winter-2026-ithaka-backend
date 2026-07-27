@@ -45,3 +45,6 @@ class Group(Base):
     deliverables: Mapped[list["Deliverable"]] = relationship(
         back_populates="group", cascade="all, delete-orphan"
     )
+    checkpoints: Mapped[list["Checkpoint"]] = relationship(
+        back_populates="group", cascade="all, delete-orphan"
+    )
