@@ -18,6 +18,10 @@ class SupportMaterialService:
         materials = self.repository.list(db)
         return [self._to_read(material) for material in materials]
 
+    def get_material(self, db: Session, material_id: int) -> SupportMaterialRead:
+        material = self._get_or_404(db, material_id)
+        return self._to_read(material)
+
     def upsert_material(
         self, db: Session, payload: SupportMaterialUpsertRequest
     ) -> SupportMaterialRead:

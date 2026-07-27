@@ -20,26 +20,27 @@ def get_support_material_service() -> SupportMaterialService:
 
 @router.get("", response_model=list[SupportMaterialRead])
 def list_materials(
-    stage_id: int | None = Query(None),
-    search: str | None = Query(None),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     service: SupportMaterialService = Depends(get_support_material_service),
 ):
-    return service.list_materials(db, stage_id=stage_id, search=search, page=page, page_size=page_size
-    )
+    return service.list_materials(db)
 
 
-
-@router.put("/{material_id}", response_model=SupportMaterialRead)
-def update_material(
+@router.get("/{material_id}", response_model=SupportMaterialRead)
+def get_material(
     material_id: int,
+    db: Session = Depends(get_db),
+    service: SupportMaterialService = Depends(get_support_material_service),
+):
+    return service.get_material(db, material_id)
+
+
+@router.put("", response_model=SupportMaterialRead)
+def upsert_material(
     payload: SupportMaterialUpsertRequest,
     db: Session = Depends(get_db),
     service: SupportMaterialService = Depends(get_support_material_service),
 ):
-    payload = payload.model_copy(update={"id": material_id})
     return service.upsert_material(db, payload)
 
 
