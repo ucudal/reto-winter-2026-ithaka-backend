@@ -88,3 +88,9 @@ class CohortService:
         return cohort_read.model_copy(
             update={"group_count": self.repository.count_groups(db, cohort.id)}
         )
+
+    @staticmethod
+    def _normalize_id(value: int | None) -> int | None:
+        if value is None or value <= 0:
+            return None
+        return value

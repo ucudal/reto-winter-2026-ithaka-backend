@@ -1,9 +1,9 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.models.tutor import Tutor
 from app.core.repositories.tutor_repository import TutorRepository
-from app.core.schemas.tutor import TutorUpdateRequest
+from app.core.schemas.tutor import TutorRead, TutorUpsertRequest
 
 
 class TutorService:
@@ -17,12 +17,24 @@ class TutorService:
     def get_tutor(self, db: Session, tutor_id: int) -> Tutor:
         tutor = self.repo.get_by_id(db, tutor_id)
         if tutor is None:
-            raise HTTPException(status_code=404, detail=f"Tutor {tutor_id} not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Tutor {tutor_id} not found")
         return tutor
 
-    def update_tutor(self, db: Session, tutor_id: int, payload: TutorUpdateRequest) -> Tutor:
-        tutor = self.get_tutor(db, tutor_id)
-        return self.repo.update(db, tutor, **payload.model_dump())
+    def upsert_tutor(self, db: Session, payload: TutorUpsertRequest) -> TutorRead:
+        if payload.id is None:
+            tutor = self.repo.create(db, payload)
+        else:
+            tutor = self.repo.get_by_id(db, payload.id)
+
+        if tutor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Tutor not found",
+            )
+
+        tutor = self.repo.update(db, tutor, payload)
+
+        return TutorRead.model_validate(tutor)
 
     def get_tutor_groups(self, db: Session, tutor_id: int):
         self.get_tutor(db, tutor_id)  # valida que exista, o lanza 404
