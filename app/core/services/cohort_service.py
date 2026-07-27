@@ -35,7 +35,7 @@ class CohortService:
         if payload.id is None:
             cohort = self.repository.create(db, payload)
         else:
-            cohort = self._get_or_404(db, target_id)
+            cohort = self._get_or_404(db, payload.id)
             cohort = self.repository.update(db, cohort, payload)
 
         return self._to_read(db, cohort)

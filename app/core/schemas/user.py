@@ -3,6 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from app.core.models.enums import UserRole
+from app.core.schemas.student import StudentRead
+from app.core.schemas.tutor import TutorRead
 
 
 class UserBase(BaseModel):
@@ -21,6 +23,8 @@ class UserUpdate(UserBase):
 
 class UserRead(UserBase):
     id: int
+    student: StudentRead | None = None
+    tutor: TutorRead | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -34,6 +38,8 @@ class LoginUser(BaseModel):
     id: int
     name: str
     role: UserRole
+    student: StudentRead | None = None
+    tutor: TutorRead | None = None
 
     model_config = ConfigDict(from_attributes=True)
 

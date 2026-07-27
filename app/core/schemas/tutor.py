@@ -15,6 +15,7 @@ class TutorRead(BaseModel):
     max_capacity: int
     availability: str | None
     status: str
+    linkedin_url: str | None = None
 
 
 class TutorUpsertRequest(BaseModel):
@@ -25,6 +26,7 @@ class TutorUpsertRequest(BaseModel):
     max_capacity: int
     availability: str | None = None
     status: str = "Active"
+    linkedin_url: str | None = None
 
 
 class TutorGroupRead(BaseModel):

@@ -17,6 +17,8 @@ class Student(Base):
     group_id: Mapped[int | None] = mapped_column(
         ForeignKey("groups.id", ondelete="SET NULL"), nullable=True
     )
+    is_graduation_project: Mapped[bool] = mapped_column(default=False)
+    linkedin_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user: Mapped["User | None"] = relationship(back_populates="student")
     group: Mapped["Group | None"] = relationship(back_populates="students")

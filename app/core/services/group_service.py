@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.core.repositories.cohort_repository import CohortRepository
 from app.core.repositories.group_repository import GroupRepository
+from app.core.repositories.deliverable_repository import DeliverableRepository
 from app.core.models.stage import Stage
 from app.core.models.student import Student
 from app.core.models.tutor import Tutor
 from app.core.models.enums import TutorRole
 from app.core.schemas.group import GroupUpsert, GroupResponse
+from app.core.schemas.deliverable import DeliverableRead
 
 
 class GroupService:
@@ -48,7 +50,21 @@ class GroupService:
 
     def change_stage(self, db: Session, group_id: int, new_stage_id: int) -> GroupResponse:
         group = self._get_or_404(db, group_id)
+        self._ensure_optional_fk_exists(db, Stage, new_stage_id, "Stage not found")
         group = self.repository.change_stage(db, group, new_stage_id)
+        return GroupResponse.model_validate(group, from_attributes=True)
+
+    def update_tutors(
+        self,
+        db: Session,
+        group_id: int,
+        business_tutor_id: int | None,
+        technical_tutor_id: int | None,
+    ) -> GroupResponse:
+        group = self._get_or_404(db, group_id)
+        self._ensure_tutor_type(db, business_tutor_id, TutorRole.BUSINESS, "Business tutor not found")
+        self._ensure_tutor_type(db, technical_tutor_id, TutorRole.TECHNICAL, "Technical tutor not found")
+        group = self.repository.update_tutors(db, group, business_tutor_id, technical_tutor_id)
         return GroupResponse.model_validate(group, from_attributes=True)
 
     def get_group_students(self, db: Session, group_id: int) -> list:
@@ -59,9 +75,10 @@ class GroupService:
         self._get_or_404(db, group_id)
         return []  # TODO: reemplazar cuando exista el módulo de Reuniones
 
-    def get_group_deliverables(self, db: Session, group_id: int) -> list:
+    def get_group_deliverables(self, db: Session, group_id: int) -> list[DeliverableRead]:
         self._get_or_404(db, group_id)
-        return []  # TODO: reemplazar cuando exista el módulo de Entregables
+        deliverables = DeliverableRepository(db).get_by_group(group_id)
+        return [DeliverableRead.model_validate(d) for d in deliverables]
 
     def _get_or_404(self, db: Session, group_id: int):
         group = self.repository.get_by_id(db, group_id)
