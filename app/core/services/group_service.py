@@ -5,13 +5,13 @@ from sqlalchemy.orm import Session
 
 from app.core.repositories.cohort_repository import CohortRepository
 from app.core.repositories.group_repository import GroupRepository
-from app.core.repositories import deliverable_repository
+from app.core.repositories.deliverable_repository import DeliverableRepository
 from app.core.models.stage import Stage
 from app.core.models.student import Student
 from app.core.models.tutor import Tutor
 from app.core.models.enums import TutorRole
 from app.core.schemas.group import GroupUpsert, GroupResponse
-from app.core.schemas.deliverable_scheme import DeliverableRead
+from app.core.schemas.deliverable import DeliverableRead
 
 
 class GroupService:
@@ -77,7 +77,7 @@ class GroupService:
 
     def get_group_deliverables(self, db: Session, group_id: int) -> list[DeliverableRead]:
         self._get_or_404(db, group_id)
-        deliverables = deliverable_repository.get_deliverables_by_group(db, group_id)
+        deliverables = DeliverableRepository(db).get_by_group(group_id)
         return [DeliverableRead.model_validate(d) for d in deliverables]
 
     def _get_or_404(self, db: Session, group_id: int):

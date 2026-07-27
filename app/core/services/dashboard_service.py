@@ -1,11 +1,12 @@
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from app.core.db.session import get_db
 from app.core.repositories.dashboard_repository import DashboardRepository
+from app.core.repositories.deliverable_repository import DeliverableRepository
 from app.core.schemas.dashboard import (
     CapacityInfo,
     DashboardAlert,
@@ -22,6 +23,7 @@ STALE_GROUP_THRESHOLD_DAYS = 14
 class DashboardService:
     def __init__(self, db: Session):
         self.repository = DashboardRepository(db)
+        self.deliverable_repository = DeliverableRepository(db)
 
     def get_summary(self) -> DashboardSummary:
         active_groups = self.repository.get_active_groups()
@@ -98,7 +100,7 @@ class DashboardService:
         return hours
 
     def _overdue_deliverable_alerts(self, group_ids, group_by_id) -> list[DashboardAlert]:
-        overdue = self.repository.get_overdue_deliverables(group_ids)
+        overdue = self.deliverable_repository.get_overdue(date.today(), group_ids=group_ids)
         alerts = []
         for deliverable in overdue:
             group = group_by_id.get(deliverable.group_id)

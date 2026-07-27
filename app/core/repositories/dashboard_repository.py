@@ -1,5 +1,3 @@
-from datetime import date
-
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
@@ -9,8 +7,6 @@ from app.core.models.group import Group
 from app.core.models.meeting import Meeting
 from app.core.models.stage import Stage
 from app.core.models.tutor import Tutor
-
-DELIVERABLE_DONE_STATUSES = ("Delivered", "Approved")
 
 
 class DashboardRepository:
@@ -60,13 +56,3 @@ class DashboardRepository:
             .all()
         )
 
-    def get_overdue_deliverables(self, group_ids: list[int]) -> list[Deliverable]:
-        if not group_ids:
-            return []
-        return (
-            self.db.query(Deliverable)
-            .filter(Deliverable.group_id.in_(group_ids))
-            .filter(Deliverable.expected_date < date.today())
-            .filter(Deliverable.status.notin_(DELIVERABLE_DONE_STATUSES))
-            .all()
-        )

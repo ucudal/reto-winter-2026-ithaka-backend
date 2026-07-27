@@ -8,7 +8,7 @@ from app.core.schemas.group import (
     GroupStageUpdate,
     GroupTutorsUpdate,
 )
-from app.core.schemas.deliverable_scheme import DeliverableRead
+from app.core.schemas.deliverable import DeliverableRead
 from app.core.services.group_service import GroupService
 
 router = APIRouter(prefix="/api/groups", tags=["groups"])
