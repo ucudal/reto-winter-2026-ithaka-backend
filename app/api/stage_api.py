@@ -12,14 +12,14 @@ from app.core.services.stage_service import StageService, get_stage_service
 router = APIRouter(prefix="/api/stages", tags=["stages"])
 
 
-@router.get("", dependencies=[Depends(require_authenticated)], response_model=list[StageRead])
+@router.get("", response_model=list[StageRead])
 def list_stages(
     _: User = Depends(require_roles(UserRole.COORDINATOR)),
     service: StageService = Depends(get_stage_service)):
     return service.get_all()
 
 
-@router.put("", dependencies=[Depends(require_coordinator)], response_model=StageRead)
+@router.put("", response_model=StageRead)
 def upsert_stage(
     data: StageUpsert,
     _: User = Depends(require_roles(UserRole.COORDINATOR)),
@@ -27,7 +27,7 @@ def upsert_stage(
     return service.upsert(data)
 
 
-@router.get("/{stage_id}/expected-deliverables",dependencies=[Depends(require_authenticated)], response_model=list[ExpectedDeliverableRead])
+@router.get("/{stage_id}/expected-deliverables", response_model=list[ExpectedDeliverableRead])
 def get_expected_deliverables(
     stage_id: int,
     _: User = Depends(require_roles(UserRole.COORDINATOR)),
