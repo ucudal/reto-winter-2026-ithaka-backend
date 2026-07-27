@@ -15,9 +15,33 @@ class CommentRepository:
     def get_by_id(self, db: Session, comment_id: int) -> Comment | None:
         return db.get(Comment, comment_id)
 
-    def create(self, db: Session, tutor_id: int, deliverable_id: int, content: str) -> Comment:
-        comment = Comment(tutor_id=tutor_id, deliverable_id=deliverable_id, content=content)
+    def create(
+        self,
+        db: Session,
+        tutor_id: int,
+        deliverable_id: int,
+        content: str,
+    ) -> Comment:
+        comment = Comment(
+            tutor_id=tutor_id,
+            deliverable_id=deliverable_id,
+            content=content,
+        )
         db.add(comment)
+        db.commit()
+        db.refresh(comment)
+        return comment
+
+    def update(
+        self,
+        db: Session,
+        comment: Comment,
+        tutor_id: int,
+        content: str,
+    ) -> Comment:
+        comment.tutor_id = tutor_id
+        comment.content = content
+
         db.commit()
         db.refresh(comment)
         return comment
