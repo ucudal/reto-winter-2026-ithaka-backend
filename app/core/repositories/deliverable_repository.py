@@ -17,8 +17,16 @@ class DeliverableRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self) -> list[Deliverable]:
-        return list(self.db.scalars(select(Deliverable)))
+    def get_all(self, page: int = 1, page_size: int = 10) -> list[Deliverable]:
+        offset = (page - 1) * page_size
+        return list(
+            self.db.scalars(
+                select(Deliverable)
+                .order_by(Deliverable.id.asc())
+                .offset(offset)
+                .limit(page_size)
+            )
+        )
 
     def get_by_id(self, deliverable_id: int) -> Deliverable | None:
         return self.db.get(Deliverable, deliverable_id)

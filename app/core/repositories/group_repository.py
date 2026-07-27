@@ -10,7 +10,8 @@ from app.core.schemas.group import GroupUpsert
 
 class GroupRepository:
 
-    def list(self, db: Session) -> list[Group]:
+    def list(self, db: Session, page: int = 1, page_size: int = 10) -> list[Group]:
+        offset = (page - 1) * page_size
         statement = (
             select(Group)
             .options(
@@ -21,6 +22,8 @@ class GroupRepository:
                 selectinload(Group.students)
             )
             .order_by(Group.name.asc(), Group.id.asc())
+            .offset(offset)
+            .limit(page_size)
         )
         return list(db.scalars(statement).all())
 

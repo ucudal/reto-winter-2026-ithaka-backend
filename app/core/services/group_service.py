@@ -20,8 +20,8 @@ class GroupService:
         self.cohort_repository = CohortRepository()
         self.repository = repository or GroupRepository()
 
-    def list_groups(self, db: Session) -> list[GroupResponse]:
-        groups = self.repository.list(db)
+    def list_groups(self, db: Session, page: int = 1, page_size: int = 10) -> list[GroupResponse]:
+        groups = self.repository.list(db, page=page, page_size=page_size)
         return [GroupResponse.model_validate(g, from_attributes=True) for g in groups]
 
     def get_group(self, db: Session, group_id: int) -> GroupResponse:
