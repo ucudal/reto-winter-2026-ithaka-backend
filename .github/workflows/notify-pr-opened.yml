@@ -1,0 +1,49 @@
+name: Notify Discord on PR opened
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    name: Notify Discord
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Discord - PR abierto
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          # Valores potencialmente no confiables (título/autor) -> por env, nunca inline.
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_HEAD: ${{ github.head_ref }}
+          PR_BASE: ${{ github.base_ref }}
+        run: |
+          set -euo pipefail
+          # jq arma el JSON escapando correctamente (evita script injection).
+          jq -n \
+            --arg title "#${PR_NUMBER} — ${PR_TITLE}" \
+            --arg url "$PR_URL" \
+            --arg author "$PR_AUTHOR" \
+            --arg branches "${PR_HEAD} → ${PR_BASE}" \
+            '{
+              username: "CI/CD Ithaka",
+              content: "📢 Nuevo PR para revisar",
+              embeds: [{
+                title: $title,
+                url: $url,
+                color: 3447003,
+                fields: [
+                  { name: "Autor",  value: $author,   inline: true },
+                  { name: "De → a", value: $branches, inline: true }
+                ]
+              }]
+            }' \
+          | curl -sf -X POST "$DISCORD_WEBHOOK" \
+              -H "Content-Type: application/json" \
+              -d @-

@@ -4,7 +4,9 @@ from app.core.db.session import get_db
 
 from app.core.schemas.group import (
     GroupUpsert,
-    GroupResponse
+    GroupResponse,
+    GroupStageUpdate,
+    GroupTutorsUpdate,
 )
 from app.core.services.group_service import GroupService
 
@@ -49,6 +51,26 @@ def delete_group(
     service.delete_group(db, group_id)
 
 
+@router.patch("/{group_id}/stage", response_model=GroupResponse)
+def update_group_stage(
+    group_id: int,
+    data: GroupStageUpdate,
+    db: Session = Depends(get_db),
+    service: GroupService = Depends(get_group_service),
+):
+    return service.change_stage(db, group_id, data.stage_id)
+
+
+@router.patch("/{group_id}/tutors", response_model=GroupResponse)
+def update_group_tutors(
+    group_id: int,
+    data: GroupTutorsUpdate,
+    db: Session = Depends(get_db),
+    service: GroupService = Depends(get_group_service),
+):
+    return service.update_tutors(db, group_id, data.business_tutor_id, data.technical_tutor_id)
+
+
 @router.get("/{group_id}/students")
 def get_group_students(
     group_id: int,
@@ -74,5 +96,3 @@ def get_group_deliverables(
     service: GroupService = Depends(get_group_service),
 ):
     return service.get_group_deliverables(db, group_id)
-
-
