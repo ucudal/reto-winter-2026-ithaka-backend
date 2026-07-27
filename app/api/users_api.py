@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.core.db.session import get_db
@@ -24,9 +24,13 @@ def read_current_user(
 def list_users(
     _: User = Depends(require_roles(UserRole.COORDINATOR)),
     db: Session = Depends(get_db),
+    role: UserRole | None = Query(None, description="Filter by user role"),
+    name_search: str | None = Query(None, description="Search by name (partial match)"),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(10, ge=1, le=100, description="Page size"),
 ) -> list[User]:
-    """Lista todos los usuarios. Solo para Coordinator."""
-    return UserRepository(db).list_all()
+    """Lista todos los usuarios. Solo para Coordinator. Soporta filtrado por rol y búsqueda por nombre."""
+    return UserRepository(db).list_all(role=role, name_search=name_search, page=page, page_size=page_size)
 
 
 @router.post(

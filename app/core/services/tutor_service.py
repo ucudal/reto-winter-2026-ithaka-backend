@@ -11,8 +11,8 @@ class TutorService:
     def __init__(self):
         self.repo = TutorRepository()
 
-    def list_tutors(self, db: Session) -> list[Tutor]:
-        return self.repo.list(db)
+    def list_tutors(self, db: Session, page: int = 1, page_size: int = 10) -> list[Tutor]:
+        return self.repo.list(db, page=page, page_size=page_size)
 
     def get_tutor(self, db: Session, tutor_id: int) -> Tutor:
         tutor = self.repo.get_by_id(db, tutor_id)
