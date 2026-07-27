@@ -12,6 +12,7 @@ class CommentRead(BaseModel):
     content: str
 
 
-class CommentCreateRequest(BaseModel):
+class CommentUpsertRequest(BaseModel):
+    id: int | None = None
     tutor_id: int
     content: str
