@@ -10,6 +10,7 @@ from app.api.auth_api import router as auth_router
 from app.api.tutors_api import router as tutors_router
 from app.api.stage_api import router as stages_router
 from app.api.groups_api import router as groups_router
+from app.api.deliverable_api import router as deliverable_router
 from app.api.dashboard_api import router as dashboard_router
 
 app = FastAPI(
@@ -31,6 +32,7 @@ app.include_router(health_router)
 app.include_router(students_router)
 app.include_router(cohort_router)
 app.include_router(groups_router)
+app.include_router(deliverable_router)
 app.include_router(dashboard_router)
 app.include_router(stages_router)
 app.include_router(auth_router)
