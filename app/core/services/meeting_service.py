@@ -7,7 +7,7 @@ from app.core.repositories.meeting_repository import MeetingRepository
 from app.core.schemas.meeting import (
     GroupMeetingsTotalHoursRead,
     MeetingRead,
-    MeetingUpdateRequest,
+    MeetingUpsertRequest,
 )
 
 
@@ -23,11 +23,12 @@ class MeetingService:
         meeting = self._get_or_404(db, meeting_id)
         return MeetingRead.model_validate(meeting, from_attributes=True)
 
-    def update_meeting(
-        self, db: Session, meeting_id: int, payload: MeetingUpdateRequest
-    ) -> MeetingRead:
-        meeting = self._get_or_404(db, meeting_id)
-        meeting = self.repository.update(db, meeting, payload)
+    def upsert_meeting(self, db: Session, payload: MeetingUpsertRequest) -> MeetingRead:
+        if payload.id is None:
+            meeting = self.repository.create(db, payload)
+        else:
+            meeting = self._get_or_404(db, payload.id)
+            meeting = self.repository.update(db, meeting, payload)
         return MeetingRead.model_validate(meeting, from_attributes=True)
 
     def delete_meeting(self, db: Session, meeting_id: int) -> None:
@@ -54,6 +55,9 @@ class MeetingService:
         )
 
     def _resolve_group_capacity(self, group) -> float:
+        # Group capacity = sum of the max_capacity of its assigned tutors
+        # (business + technical). Tutors that are not yet assigned
+        # contribute 0.
         capacity = 0
         if getattr(group, "business_tutor", None) is not None:
             capacity += group.business_tutor.max_capacity or 0
@@ -69,4 +73,3 @@ class MeetingService:
                 detail="Meeting not found",
             )
         return meeting
-    

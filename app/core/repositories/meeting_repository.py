@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.models.group import Group
 from app.core.models.meeting import Meeting
-from app.core.schemas.meeting import MeetingUpdateRequest
+from app.core.schemas.meeting import MeetingUpsertRequest
 
 
 class MeetingRepository:
@@ -16,8 +16,15 @@ class MeetingRepository:
     def get_by_id(self, db: Session, meeting_id: int) -> Meeting | None:
         return db.get(Meeting, meeting_id)
 
-    def update(self, db: Session, meeting: Meeting, payload: MeetingUpdateRequest) -> Meeting:
-        for field, value in payload.model_dump().items():
+    def create(self, db: Session, payload: MeetingUpsertRequest) -> Meeting:
+        meeting = Meeting(**payload.model_dump(exclude={"id"}))
+        db.add(meeting)
+        db.commit()
+        db.refresh(meeting)
+        return meeting
+
+    def update(self, db: Session, meeting: Meeting, payload: MeetingUpsertRequest) -> Meeting:
+        for field, value in payload.model_dump(exclude={"id"}).items():
             setattr(meeting, field, value)
         db.commit()
         db.refresh(meeting)
@@ -35,4 +42,3 @@ class MeetingRepository:
 
     def get_group(self, db: Session, group_id: int) -> Group | None:
         return db.get(Group, group_id)
-    
