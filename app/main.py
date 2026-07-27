@@ -10,6 +10,7 @@ from app.api.auth_api import router as auth_router
 from app.api.tutors_api import router as tutors_router
 from app.api.stage_api import router as stages_router
 from app.api.groups_api import router as groups_router
+from app.api.document import router as document_router
 from app.api.comment import router as comment_router
 from app.api.deliverable_api import router as deliverable_router
 from app.api.dashboard_api import router as dashboard_router
@@ -40,4 +41,5 @@ app.include_router(stages_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(tutors_router)
+app.include_router(document_router)
 app.include_router(comment_router)
