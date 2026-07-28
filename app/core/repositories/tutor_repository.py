@@ -11,8 +11,9 @@ from app.core.schemas.tutor import TutorUpsertRequest
 
 class TutorRepository:
 
-    def list(self, db: Session) -> list[Tutor]:
-        statement = select(Tutor).order_by(Tutor.name.asc())
+    def list(self, db: Session, page: int = 1, page_size: int = 10) -> list[Tutor]:
+        offset = (page - 1) * page_size
+        statement = select(Tutor).order_by(Tutor.name.asc()).offset(offset).limit(page_size)
         return list(db.scalars(statement).all())
 
     def get_by_id(self, db: Session, tutor_id: int) -> Tutor | None:
