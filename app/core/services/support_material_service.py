@@ -14,8 +14,17 @@ class SupportMaterialService:
     def __init__(self, repository: SupportMaterialRepository | None = None):
         self.repository = repository or SupportMaterialRepository()
 
-    def list_materials(self, db: Session) -> list[SupportMaterialRead]:
-        materials = self.repository.list(db)
+    def list_materials(
+        self,
+        db: Session,
+        stage_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ) -> list[SupportMaterialRead]:
+        materials = self.repository.list(
+            db, stage_id=stage_id, search=search, page=page, page_size=page_size
+        )
         return [self._to_read(material) for material in materials]
 
     def get_material(self, db: Session, material_id: int) -> SupportMaterialRead:
