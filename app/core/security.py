@@ -98,16 +98,13 @@ def require_roles(*roles: UserRole):
     return dependency
 
 
-def require_coordinator():
-    return require_roles(UserRole.COORDINATOR)
+require_coordinator() = require_roles(UserRole.COORDINATOR)
 
 
-def require_tutor_or_coordinator():
-    return require_roles(
-        UserRole.COORDINATOR,
-        UserRole.BUSINESS_TUTOR,
-        UserRole.TECHNICAL_TUTOR,
+require_tutor_or_coordinator() = require_roles(
+    UserRole.COORDINATOR,
+    UserRole.BUSINESS_TUTOR,
+    UserRole.TECHNICAL_TUTOR,
 )
 
-def require_authenticated():
-    return get_current_user
+require_authenticated() = get_current_user
