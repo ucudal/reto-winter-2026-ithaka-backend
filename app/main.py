@@ -46,10 +46,7 @@ app.include_router(stages_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(tutors_router)
-<<<<<<< HEAD
-app.include_router(comment_router)
 app.include_router(checkpoints_router)
-=======
 app.include_router(document_router)
 app.include_router(comment_router)
->>>>>>> testing
+
