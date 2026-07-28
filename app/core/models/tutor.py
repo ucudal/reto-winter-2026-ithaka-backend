@@ -21,6 +21,7 @@ class Tutor(Base):
     max_capacity: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     availability: Mapped[str | None] = mapped_column(String(200), nullable=True)
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="Active")
+    linkedin_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user: Mapped["User | None"] = relationship(back_populates="tutor")
     groups_as_business_tutor: Mapped[list["Group"]] = relationship(
