@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.db.session import get_db
@@ -14,6 +14,8 @@ service = TutorService()
 
 @router.get("", response_model=list[TutorRead], dependencies=[Depends(require_authenticated)])
 def list_tutors(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db)):
     return service.list_tutors(db)
 
