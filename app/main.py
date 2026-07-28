@@ -13,6 +13,7 @@ from app.api.groups_api import router as groups_router
 from app.api.comment import router as comment_router
 from app.api.deliverable_api import router as deliverable_router
 from app.api.dashboard_api import router as dashboard_router
+from app.api.comment import router as comment_router
 
 
 app = FastAPI(
@@ -40,4 +41,9 @@ app.include_router(stages_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(tutors_router)
+app.include_router(comment_router)
+
+app.include_router(stages_router)
+app.include_router(cohort_router)
+app.include_router(groups_router)
 app.include_router(comment_router)
