@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
+from app.api.materials import router as material_router
 from app.api.students_api import router as students_router
 from app.api.users_api import router as users_router
 from app.api.auth_api import router as auth_router
@@ -32,6 +33,7 @@ app.add_middleware(
 
 
 app.include_router(health_router)
+app.include_router(material_router)
 app.include_router(students_router)
 app.include_router(cohort_router)
 app.include_router(groups_router)
