@@ -1,6 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from app.core.models.enums import TutorRole
 from app.core.models.tutor import Tutor
 from app.core.repositories.tutor_repository import TutorRepository
 from app.core.schemas.tutor import TutorRead, TutorUpsertRequest
@@ -11,8 +12,18 @@ class TutorService:
     def __init__(self):
         self.repo = TutorRepository()
 
-    def list_tutors(self, db: Session, page: int = 1, page_size: int = 10) -> list[Tutor]:
-        return self.repo.list(db, page=page, page_size=page_size)
+    def list_tutors(
+        self,
+        db: Session,
+        role: TutorRole | None = None,
+        status: str | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ) -> list[Tutor]:
+        return self.repo.list(
+            db, role=role, status=status, search=search, page=page, page_size=page_size
+        )
 
     def get_tutor(self, db: Session, tutor_id: int) -> Tutor:
         tutor = self.repo.get_by_id(db, tutor_id)
@@ -46,7 +57,7 @@ class TutorService:
         return self._build_capacity(tutor, meetings)
 
     def list_overloaded(self, db: Session) -> list[dict]:
-        tutors = self.repo.list(db)
+        tutors = self.repo.list_all(db)
         result = []
         for tutor in tutors:
             meetings = self.repo.list_meetings(db, tutor.id)

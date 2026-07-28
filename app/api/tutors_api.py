@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.db.session import get_db
+from app.core.models.enums import TutorRole
 from app.core.schemas.tutor import TutorCapacityRead, TutorGroupRead, TutorRead, TutorUpsertRequest
 from app.core.services.tutor_service import TutorService
 
@@ -11,11 +12,16 @@ service = TutorService()
 
 @router.get("", response_model=list[TutorRead])
 def list_tutors(
+    role: TutorRole | None = Query(None),
+    status: str | None = Query(None),
+    search: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    return service.list_tutors(db, page=page, page_size=page_size)
+    return service.list_tutors(
+        db, role=role, status=status, search=search, page=page, page_size=page_size
+    )
 
 
 @router.get("/overloaded", response_model=list[TutorCapacityRead])
