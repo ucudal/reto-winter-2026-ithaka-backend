@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from app.core.db.session import get_db
 from app.core.schemas.student import StudentUpsert, StudentRead
@@ -8,8 +8,12 @@ router = APIRouter(prefix="/api/students", tags=["Students"])
 
 
 @router.get("", response_model=list[StudentRead])
-def list_students(db: Session = Depends(get_db)):
-    return StudentService(db).list_students()
+def list_students(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    return StudentService(db).list_students(page=page, page_size=page_size)
 
 
 @router.get("/{student_id}", response_model=StudentRead)
