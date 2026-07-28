@@ -31,3 +31,4 @@ class Checkpoint(Base):
     responses: Mapped[list["CheckpointResponse"]] = relationship(
         back_populates="checkpoint", cascade="all, delete-orphan"
     )
+    
