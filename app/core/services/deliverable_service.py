@@ -16,8 +16,8 @@ class DeliverableService:
     def __init__(self, db: Session):
         self.repository = DeliverableRepository(db)
 
-    def get_all(self) -> list[DeliverableRead]:
-        deliverables = self.repository.get_all()
+    def get_all(self, page: int = 1, page_size: int = 10) -> list[DeliverableRead]:
+        deliverables = self.repository.get_all(page=page, page_size=page_size)
         return [DeliverableRead.model_validate(d) for d in deliverables]
 
     def get_by_id(self, deliverable_id: int) -> DeliverableRead:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.core.schemas.deliverable import DeliverableRead, DeliverableUpdate
 from app.core.security import require_authenticated, require_tutor_or_coordinator
@@ -22,9 +22,11 @@ def get_overdue_deliverables(service: DeliverableService = Depends(get_deliverab
 
 
 @router.get("", response_model=list[DeliverableRead], dependencies=[Depends(require_authenticated)])
-def list_deliverables(service: DeliverableService = Depends(get_deliverable_service)):
-    return service.get_all()
-
+def list_deliverables(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
+    service: DeliverableService = Depends(get_deliverable_service),):
+    return service.get_all(page=page, page_size=page_size)
 
 @router.get("/{deliverable_id}", response_model=DeliverableRead, dependencies=[Depends(require_authenticated)])
 def get_deliverable(deliverable_id: int, service: DeliverableService = Depends(get_deliverable_service)):
