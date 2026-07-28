@@ -1,0 +1,53 @@
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.core.db.session import get_db
+from app.core.schemas.support_material import (
+    SupportMaterialRead,
+    SupportMaterialUpsertRequest,
+)
+from app.core.services.support_material_service import SupportMaterialService
+
+router = APIRouter(
+    prefix="/api/materials",
+    tags=["Support Materials"],
+)
+
+
+def get_support_material_service() -> SupportMaterialService:
+    return SupportMaterialService()
+
+
+@router.get("", response_model=list[SupportMaterialRead])
+def list_materials(
+    db: Session = Depends(get_db),
+    service: SupportMaterialService = Depends(get_support_material_service),
+):
+    return service.list_materials(db)
+
+
+@router.get("/{material_id}", response_model=SupportMaterialRead)
+def get_material(
+    material_id: int,
+    db: Session = Depends(get_db),
+    service: SupportMaterialService = Depends(get_support_material_service),
+):
+    return service.get_material(db, material_id)
+
+
+@router.put("", response_model=SupportMaterialRead)
+def upsert_material(
+    payload: SupportMaterialUpsertRequest,
+    db: Session = Depends(get_db),
+    service: SupportMaterialService = Depends(get_support_material_service),
+):
+    return service.upsert_material(db, payload)
+
+
+@router.delete("/{material_id}", status_code=204)
+def delete_material(
+    material_id: int,
+    db: Session = Depends(get_db),
+    service: SupportMaterialService = Depends(get_support_material_service),
+):
+    service.delete_material(db, material_id)
