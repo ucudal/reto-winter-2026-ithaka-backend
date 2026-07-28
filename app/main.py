@@ -4,12 +4,15 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
+from app.api.meetings_api import router as meetings_router
+from app.api.materials import router as material_router
 from app.api.students_api import router as students_router
 from app.api.users_api import router as users_router
 from app.api.auth_api import router as auth_router
 from app.api.tutors_api import router as tutors_router
 from app.api.stage_api import router as stages_router
 from app.api.groups_api import router as groups_router
+from app.api.document import router as document_router
 from app.api.comment import router as comment_router
 from app.api.deliverable_api import router as deliverable_router
 from app.api.dashboard_api import router as dashboard_router
@@ -26,13 +29,15 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=[""],
+    allow_headers=[""],
 )
 
 
 app.include_router(health_router)
+app.include_router(material_router)
 app.include_router(students_router)
+app.include_router(meetings_router)
 app.include_router(cohort_router)
 app.include_router(groups_router)
 app.include_router(deliverable_router)
@@ -41,5 +46,10 @@ app.include_router(stages_router)
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(tutors_router)
+<<<<<<< HEAD
 app.include_router(comment_router)
 app.include_router(checkpoints_router)
+=======
+app.include_router(document_router)
+app.include_router(comment_router)
+>>>>>>> testing

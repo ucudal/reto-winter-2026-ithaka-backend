@@ -35,8 +35,18 @@ class UserRepository:
         )
         return self.db.execute(stmt).scalar_one_or_none()
 
-    def list_all(self) -> list[User]:
-        stmt = select(User).order_by(User.id)
+    def list_all(self, *, role: UserRole | None = None, name_search: str | None = None, page: int = 1, page_size: int = 10) -> list[User]:
+        stmt = select(User)
+        
+        if role is not None:
+            stmt = stmt.where(User.role == role)
+        
+        if name_search is not None:
+            stmt = stmt.where(User.name.ilike(f"%{name_search}%"))
+        
+        stmt = stmt.order_by(User.id)
+        offset = (page - 1) * page_size
+        stmt = stmt.offset(offset).limit(page_size)
         return list(self.db.execute(stmt).scalars().all())
 
     def create(

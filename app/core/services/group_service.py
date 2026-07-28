@@ -10,8 +10,10 @@ from app.core.models.stage import Stage
 from app.core.models.student import Student
 from app.core.models.tutor import Tutor
 from app.core.models.enums import TutorRole
+from app.core.models.user import User
 from app.core.schemas.group import GroupUpsert, GroupResponse
 from app.core.schemas.deliverable import DeliverableRead
+from app.core.services.access import filter_groups_for_user, user_can_access_group
 
 
 class GroupService:
@@ -20,12 +22,16 @@ class GroupService:
         self.cohort_repository = CohortRepository()
         self.repository = repository or GroupRepository()
 
-    def list_groups(self, db: Session) -> list[GroupResponse]:
+    def list_groups(self, db: Session, current_user: User, page: int = 1, page_size: int = 10) -> list[GroupResponse]:
         groups = self.repository.list(db)
+        groups = filter_groups_for_user(groups, current_user)
+        start = (page - 1) * page_size
+        groups = groups[start : start + page_size]
         return [GroupResponse.model_validate(g, from_attributes=True) for g in groups]
 
-    def get_group(self, db: Session, group_id: int) -> GroupResponse:
+    def get_group(self, db: Session, group_id: int, current_user: User) -> GroupResponse:
         group = self._get_or_404(db, group_id)
+        self._ensure_access(group, current_user)
         return GroupResponse.model_validate(group, from_attributes=True)
 
     def upsert_group(self, db: Session, payload: GroupUpsert) -> GroupResponse:
@@ -48,8 +54,9 @@ class GroupService:
         group = self._get_or_404(db, group_id)
         self.repository.delete(db, group)
 
-    def change_stage(self, db: Session, group_id: int, new_stage_id: int) -> GroupResponse:
+    def change_stage(self, db: Session, group_id: int, new_stage_id: int, current_user: User) -> GroupResponse:
         group = self._get_or_404(db, group_id)
+        self._ensure_access(group, current_user)
         self._ensure_optional_fk_exists(db, Stage, new_stage_id, "Stage not found")
         group = self.repository.change_stage(db, group, new_stage_id)
         return GroupResponse.model_validate(group, from_attributes=True)
@@ -67,18 +74,29 @@ class GroupService:
         group = self.repository.update_tutors(db, group, business_tutor_id, technical_tutor_id)
         return GroupResponse.model_validate(group, from_attributes=True)
 
-    def get_group_students(self, db: Session, group_id: int) -> list:
-        self._get_or_404(db, group_id)
+    def get_group_students(self, db: Session, group_id: int, current_user: User) -> list:
+        group = self._get_or_404(db, group_id)
+        self._ensure_access(group, current_user)
         return []  # TODO: reemplazar cuando exista el módulo de Estudiantes
 
-    def get_group_meetings(self, db: Session, group_id: int) -> list:
-        self._get_or_404(db, group_id)
+    def get_group_meetings(self, db: Session, group_id: int, current_user: User) -> list:
+        group = self._get_or_404(db, group_id)
+        self._ensure_access(group, current_user)
         return []  # TODO: reemplazar cuando exista el módulo de Reuniones
 
-    def get_group_deliverables(self, db: Session, group_id: int) -> list[DeliverableRead]:
-        self._get_or_404(db, group_id)
+    def get_group_deliverables(self, db: Session, group_id: int, current_user: User) -> list[DeliverableRead]:
+        group = self._get_or_404(db, group_id)
+        self._ensure_access(group, current_user)
         deliverables = DeliverableRepository(db).get_by_group(group_id)
         return [DeliverableRead.model_validate(d) for d in deliverables]
+
+    def _ensure_access(self, group, current_user: User) -> None:
+        """Verifica que el usuario tenga permiso sobre ESTE grupo puntual."""
+        if not user_can_access_group(group, current_user):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have access to this group",
+            )
 
     def _get_or_404(self, db: Session, group_id: int):
         group = self.repository.get_by_id(db, group_id)

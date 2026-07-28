@@ -14,8 +14,8 @@ class StudentService:
         if group_id is not None and self.db.get(Group, group_id) is None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Group not found")
 
-    def list_students(self):
-        return self.repo.get_all()
+    def list_students(self, page: int = 1, page_size: int = 10):
+        return self.repo.get_all(page=page, page_size=page_size)
 
     def get_student(self, student_id: int):
         student = self.repo.get_by_id(student_id)
