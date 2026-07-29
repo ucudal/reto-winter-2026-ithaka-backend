@@ -18,24 +18,39 @@ class DeliverableRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_all(self, page: int = 1, page_size: int = 10) -> list[Deliverable]:
-        offset = (page - 1) * page_size
-        return list(
-            self.db.scalars(
-                select(Deliverable)
-                .options(joinedload(Deliverable.stage))
-                .order_by(Deliverable.id.asc())
-                .offset(offset)
-                .limit(page_size)
-            )
+    def get_all(
+        self,
+        group_id: int | None = None,
+        stage_id: int | None = None,
+        status: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ) -> list[Deliverable]:
+        statement = (
+            select(Deliverable)
+            .options(joinedload(Deliverable.stage))
         )
 
+        if group_id is not None:
+            statement = statement.where(Deliverable.group_id == group_id)
+        if stage_id is not None:
+            statement = statement.where(Deliverable.stage_id == stage_id)
+        if status is not None:
+            statement = statement.where(Deliverable.status == status)
+
+        statement = statement.order_by(Deliverable.id.asc())
+        offset = (page - 1) * page_size
+        statement = statement.offset(offset).limit(page_size)
+
+        return list(self.db.scalars(statement).all())
+
     def get_by_id(self, deliverable_id: int) -> Deliverable | None:
-        return self.db.get(
+        statement = (
             select(Deliverable)
             .options(joinedload(Deliverable.stage))
             .where(Deliverable.id == deliverable_id)
         )
+        return self.db.scalar(statement)
 
     def update(self, deliverable: Deliverable, data: dict) -> Deliverable:
         for field, value in data.items():
