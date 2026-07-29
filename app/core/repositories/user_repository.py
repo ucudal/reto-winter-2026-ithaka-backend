@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.models.enums import UserRole
@@ -37,12 +37,12 @@ class UserRepository:
 
     def list_all(self, *, role: UserRole | None = None, name_search: str | None = None, page: int = 1, page_size: int = 10) -> tuple[list[User], int]:
         # Get total count
-        count_stmt = select(User)
+        count_stmt = select(func.count(User.id))
         if role is not None:
             count_stmt = count_stmt.where(User.role == role)
         if name_search is not None:
             count_stmt = count_stmt.where(User.name.ilike(f"%{name_search}%"))
-        total = self.db.execute(count_stmt).scalars().count()
+        total = self.db.execute(count_stmt).scalar() or 0
         
         # Get paginated items
         stmt = select(User)
