@@ -22,12 +22,34 @@ class GroupService:
         self.cohort_repository = CohortRepository()
         self.repository = repository or GroupRepository()
 
-    def list_groups(self, db: Session, current_user: User, page: int = 1, page_size: int = 10) -> list[GroupResponse]:
-        groups = self.repository.list(db)
-        groups = filter_groups_for_user(groups, current_user)
-        start = (page - 1) * page_size
-        groups = groups[start : start + page_size]
-        return [GroupResponse.model_validate(g, from_attributes=True) for g in groups]
+    def list_groups(
+            self,
+            db: Session,
+            current_user: User,
+            page: int = 1,
+            page_size: int = 10,
+            cohort_id: int | None = None,
+            stage_id: int | None = None,
+            business_tutor_id: int | None = None,
+            technical_tutor_id: int | None = None,
+            status: str | None = None,
+            search: str | None = None,
+        ) -> list[GroupResponse]:
+            groups = self.repository.list(
+                db,
+                page=None,
+                page_size=None,
+                cohort_id=cohort_id,
+                stage_id=stage_id,
+                business_tutor_id=business_tutor_id,
+                technical_tutor_id=technical_tutor_id,
+                status=status,
+                search=search,
+            )
+            groups = filter_groups_for_user(groups, current_user)
+            start = (page - 1) * page_size
+            groups = groups[start : start + page_size]
+            return [GroupResponse.model_validate(g, from_attributes=True) for g in groups]
 
     def get_group(self, db: Session, group_id: int, current_user: User) -> GroupResponse:
         group = self._get_or_404(db, group_id)

@@ -6,10 +6,28 @@ from app.core.schemas.support_material import SupportMaterialUpsertRequest
 
 
 class SupportMaterialRepository:
-    def list(self, db: Session) -> list[SupportMaterial]:
-        statement = select(SupportMaterial).order_by(
+    def list(
+        self,
+        db: Session,
+        stage_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ) -> list[SupportMaterial]:
+        statement = select(SupportMaterial)
+
+        if stage_id is not None:
+            statement = statement.where(SupportMaterial.stage_id == stage_id)
+        if search is not None:
+            statement = statement.where(SupportMaterial.title.ilike(f"%{search}%"))
+
+        statement = statement.order_by(
             SupportMaterial.stage_id.asc(), SupportMaterial.id.asc()
         )
+
+        offset = (page - 1) * page_size
+        statement = statement.offset(offset).limit(page_size)
+
         return list(db.scalars(statement).all())
 
     def get_by_id(self, db: Session, material_id: int) -> SupportMaterial | None:
