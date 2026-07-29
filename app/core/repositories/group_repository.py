@@ -12,8 +12,8 @@ class GroupRepository:
 
     def list(self,
         db: Session,
-        page: int = 1,
-        page_size: int = 10,
+        page: int | None= 1,
+        page_size: int | None = 10,
         cohort_id: int | None = None,
         stage_id: int | None = None,
         business_tutor_id: int | None = None,
@@ -21,13 +21,12 @@ class GroupRepository:
         status: str | None = None,
         search: str | None = None,
     ) -> list[Group]:
-        offset = (page - 1) * page_size
         statement = select(Group). options(
             joinedload(Group.business_tutor),
             joinedload(Group.technical_tutor),
             joinedload(Group.current_stage),
             joinedload(Group.cohort),
-            selectinload(Group.students),
+            selectinload(Group.students)
         )
         
         if cohort_id is not None:
@@ -43,11 +42,12 @@ class GroupRepository:
         if search is not None:
             statement = statement.where(Group.name.ilike(f"%{search}%"))
 
-            statement = (
-                statement.order_by(Group.name.asc(), Group.id.asc())
-                .offset(offset)
-                .limit(page_size)
-        )
+        statement = statement.order_by(Group.name.asc(), Group.id.asc())
+
+        if page is not None and page_size is not None:
+            offset = (page - 1) * page_size
+            statement = statement.offset(offset).limit(page_size)
+        
         return list(db.scalars(statement).all())
 
     def get_by_id(self, db: Session, group_id: int) -> Group | None:
