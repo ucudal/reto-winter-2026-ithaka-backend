@@ -10,11 +10,18 @@ router = APIRouter(prefix="/api/students", tags=["Students"])
 
 @router.get("", response_model=list[StudentRead], dependencies=[Depends(require_tutor_or_coordinator)])
 def list_students(
+    group_id: int | None = Query(None),
+    search: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
-    return StudentService(db).list_students(page=page, page_size=page_size)
+    return StudentService(db).list_students(
+        group_id=group_id,
+        search=search,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @router.get("/{student_id}", response_model=StudentRead, dependencies=[Depends(require_authenticated)])

@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.cohort_api import router as cohort_router
 from app.api.health import router as health_router
 from app.api.meetings_api import router as meetings_router
-from app.api.materials import router as material_router
+from app.api.materials_api import router as material_router
 from app.api.students_api import router as students_router
 from app.api.users_api import router as users_router
 from app.api.auth_api import router as auth_router
@@ -16,6 +16,7 @@ from app.api.document import router as document_router
 from app.api.comment import router as comment_router
 from app.api.deliverable_api import router as deliverable_router
 from app.api.dashboard_api import router as dashboard_router
+from app.api.checkpoints import router as checkpoint_router
 
 
 app = FastAPI(
@@ -28,8 +29,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=[""],
-    allow_headers=[""],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -47,3 +48,4 @@ app.include_router(users_router)
 app.include_router(tutors_router)
 app.include_router(document_router)
 app.include_router(comment_router)
+app.include_router(checkpoint_router)

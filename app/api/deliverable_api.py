@@ -23,10 +23,16 @@ def get_overdue_deliverables(service: DeliverableService = Depends(get_deliverab
 
 @router.get("", response_model=list[DeliverableRead], dependencies=[Depends(require_authenticated)])
 def list_deliverables(
+    group_id: int | None = Query(None),
+    stage_id: int | None = Query(None),
+    status: str | None = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
-    service: DeliverableService = Depends(get_deliverable_service),):
-    return service.get_all(page=page, page_size=page_size)
+    service: DeliverableService = Depends(get_deliverable_service),
+):
+    return service.get_all(
+        group_id=group_id, stage_id=stage_id, status=status, page=page, page_size=page_size
+    )
 
 @router.get("/{deliverable_id}", response_model=DeliverableRead, dependencies=[Depends(require_authenticated)])
 def get_deliverable(deliverable_id: int, service: DeliverableService = Depends(get_deliverable_service)):
