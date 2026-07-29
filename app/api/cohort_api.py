@@ -5,7 +5,7 @@ from app.core.db.session import get_db
 from app.core.models.enums import UserRole
 from app.core.models.user import User
 from app.core.schemas.cohort import CohortRead, CohortGroupRead, CohortStageRead, CohortUpsertRequest
-from app.core.security import get_current_user, require_roles
+from app.core.security import get_current_user, require_roles, require_authenticated
 from app.core.services.cohort_service import CohortService
 
 router = APIRouter(
@@ -18,7 +18,7 @@ def get_cohort_service() -> CohortService:
     return CohortService()
 
 
-@router.get("", response_model=list[CohortRead])
+@router.get("", response_model=list[CohortRead], dependencies=[Depends(require_authenticated)])
 def list_cohorts(
     year: int | None = Query(None),
     semester: int | None = Query(None),
@@ -33,7 +33,7 @@ def list_cohorts(
     return service.list_cohorts(db, year=year, semester=semester, status=status, page=page, page_size=page_size)
 
 
-@router.get("/{cohort_id}", response_model=CohortRead)
+@router.get("/{cohort_id}", response_model=CohortRead, dependencies=[Depends(require_authenticated)])
 def get_cohort(
     cohort_id: int,
     _: User = Depends(get_current_user),
@@ -66,7 +66,7 @@ def list_groups(
     return service.list_groups(db, cohort_id, current_user)
 
 
-@router.get("/{cohort_id}/stages", response_model=list[CohortStageRead])
+@router.get("/{cohort_id}/stages", response_model=list[CohortStageRead], dependencies=[Depends(require_authenticated)])
 def list_stages(
     cohort_id: int,
     _: User = Depends(get_current_user),
