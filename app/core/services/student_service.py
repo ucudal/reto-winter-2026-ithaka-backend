@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.core.models.group import Group
 from app.core.repositories.student_repository import StudentRepository
-from app.core.schemas.student import StudentListResponse, StudentUpsert
+from app.core.schemas.student import StudentUpsert
 
 
 class StudentService:
@@ -21,12 +21,12 @@ class StudentService:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> StudentListResponse:
-        items, total_items = self.repo.get_all(
-            group_id=group_id, search=search, page=page, page_size=page_size
-        )
-        return StudentListResponse(
-            items=items, total_items=total_items, page=page, page_size=page_size
+    ):
+        return self.repo.get_all(
+            group_id=group_id,
+            search=search,
+            page=page,
+            page_size=page_size,
         )
 
     def get_student(self, student_id: int):
