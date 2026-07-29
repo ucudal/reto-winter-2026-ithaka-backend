@@ -34,6 +34,9 @@
 **SupportMaterial** — `id`, `stage_id` → Stage, `title`, `url`
 → relationships: `stage`
 
+**Checkpoint** — `id`, `group_id` → Group, `cohort_id` → Cohort, `title`, `due_date`, `status` *(default: "Pending")*, `questions` *(JSONB list of `{id, text, answer}`)*
+→ relationships: `group`, `cohort`
+
 ## Support / infrastructure
 
 **User** — `id`, `name`, `email` *(unique)*, `role` *(enum: Coordinator | BusinessTutor | TechnicalTutor | Student)*, `password_hash`
@@ -115,6 +118,12 @@ DELETE /api/documents/{id}
 # Comments
 GET    /api/deliverables/{deliverableId}/comments
 POST   /api/deliverables/{deliverableId}/comments
+
+# Checkpoints
+GET    /api/checkpoints
+GET    /api/checkpoints/my-pending
+GET    /api/checkpoints/{id}
+PUT    /api/checkpoints/{id}
 DELETE /api/comments/{id}
 
 # Support Materials
@@ -425,7 +434,7 @@ POST   /api/users
 
 // response
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "token": "...",
   "user": {
     "id": 8,
     "name": "María Pérez",
