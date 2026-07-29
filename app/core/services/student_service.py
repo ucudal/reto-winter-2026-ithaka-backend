@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+
 from app.core.models.group import Group
 from app.core.repositories.student_repository import StudentRepository
 from app.core.schemas.student import StudentUpsert
@@ -14,8 +15,19 @@ class StudentService:
         if group_id is not None and self.db.get(Group, group_id) is None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Group not found")
 
-    def list_students(self):
-        return self.repo.get_all()
+    def list_students(
+        self,
+        group_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        page_size: int = 10,
+    ):
+        return self.repo.get_all(
+            group_id=group_id,
+            search=search,
+            page=page,
+            page_size=page_size,
+        )
 
     def get_student(self, student_id: int):
         student = self.repo.get_by_id(student_id)
@@ -25,10 +37,10 @@ class StudentService:
 
     def upsert_student(self, data: StudentUpsert):
         self._check_group_exists(data.group_id)
-        
+
         if data.id is None:
             return self.repo.create(data)
-        
+
         student = self.repo.get_by_id(data.id)
 
         if student is None:
