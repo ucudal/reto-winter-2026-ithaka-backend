@@ -22,15 +22,23 @@ class CheckpointService:
 
     def list_checkpoints(
         self,
-        db:Session
+        db: Session,
+        group_id: int | None = None,
+        search: str | None = None,
     ):
+
+        checkpoints = self.repository.list(
+            db=db,
+            group_id=group_id,
+            search=search
+        )
 
         return [
             CheckpointRead.model_validate(
-                c,
+                checkpoint,
                 from_attributes=True
             )
-            for c in self.repository.list(db)
+            for checkpoint in checkpoints
         ]
 
 

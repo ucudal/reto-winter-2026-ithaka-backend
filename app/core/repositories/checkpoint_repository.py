@@ -1,7 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 
 from app.core.models.checkpoint import Checkpoint
+from app.core.models.group import Group
 
 
 class CheckpointRepository:
@@ -9,9 +10,25 @@ class CheckpointRepository:
 
     def list(
         self,
-        db: Session
+        db: Session,
+        group_id: int | None = None,
+        search: str | None = None,
     ):
-        statement = select(Checkpoint)
+
+        statement = (
+            select(Checkpoint)
+            .join(Group)
+        )
+
+        if group_id is not None:
+            statement = statement.where(
+                Checkpoint.group_id == group_id
+            )
+
+        if search:
+            statement = statement.where(
+                Group.name.ilike(f"%{search}%")
+            )
 
         return list(
             db.scalars(statement).all()

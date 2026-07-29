@@ -30,17 +30,19 @@ def get_checkpoint_service():
 @router.get(
     "",
     response_model=list[CheckpointRead],
-    dependencies=[
-        Depends(require_authenticated)
-    ]
+    dependencies=[Depends(require_authenticated)]
 )
 def list_checkpoints(
-    db:Session=Depends(get_db),
-    service:CheckpointService=Depends(get_checkpoint_service)
+    group_id: Optional[int] = None,
+    search: Optional[str] = None,
+    db: Session = Depends(get_db),
+    service: CheckpointService = Depends(get_checkpoint_service)
 ):
-
-    return service.list_checkpoints(db)
-
+    return service.list_checkpoints(
+        db=db,
+        group_id=group_id,
+        search=search
+    )
 
 
 @router.get(
