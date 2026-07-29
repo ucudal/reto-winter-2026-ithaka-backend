@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from app.core.db.session import SessionLocal
 from app.core.models import (
     Base, User, Cohort, Stage, Tutor, Group, Student,
-    Deliverable, Meeting, SupportMaterial, Document, Comment
+    Deliverable, Meeting, SupportMaterial, Document,
+    Comment, Checkpoint
 )
 from app.core.models.enums import UserRole, TutorRole, DocumentPlatform, EntityType
 from app.core.models.meeting import MeetingStatus
@@ -24,6 +25,7 @@ def seed_database(force: bool = False):
             db.query(SupportMaterial).delete()
             db.query(Meeting).delete()
             db.query(Deliverable).delete()
+            db.query(Checkpoint).delete()
             db.query(Student).delete()
             db.query(Group).delete()
             db.query(Tutor).delete()
@@ -189,7 +191,17 @@ def seed_database(force: bool = False):
         db.add_all(students)
         db.flush()
 
-        # 7. Crear Entregables (15 Entregables)
+        # 7. Crear Checkpoints (15 Checkpoints)
+        print("- Creando Checkpoints (15)...")
+        checkpoints = [
+            Checkpoint(group_id=groups[0].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - EcoRoute", due_date=date(2026, 7, 15), status="Pending", questions=[{"id": 1, "text": "¿El grupo tuvo asistencia regular?", "answer": None}, {"id": 2, "text": "¿El grupo tuvo avances esperados?", "answer": None}]),
+            Checkpoint(group_id=groups[1].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - HealthPulse", due_date=date(2026, 8, 10), status="Pending", questions=[{"id": 1, "text": "¿El grupo tuvo asistencia regular?", "answer": None}, {"id": 2, "text": "¿El grupo tuvo avances esperados?", "answer": None}]),
+            Checkpoint(group_id=groups[2].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - AgroSmart", due_date=date(2026, 9, 15), status="Pending", questions=[{"id": 1, "text": "¿Hubo avance técnico?", "answer": None}]),
+        ]
+        db.add_all(checkpoints)
+        db.flush()
+
+        # 8. Crear Entregables (15 Entregables)
         print("- Creando Entregables (15)...")
         deliverables = [
             Deliverable(group_id=groups[0].id, stage_id=stage_1.id, expected_date=date(2026, 3, 30), status="Approved"),
@@ -211,7 +223,7 @@ def seed_database(force: bool = False):
         db.add_all(deliverables)
         db.flush()
 
-        # 8. Crear Reuniones (15 Reuniones)
+        # 9. Crear Reuniones (15 Reuniones)
         print("- Creando Reuniones (15)...")
         meetings = [
             Meeting(group_id=groups[0].id, tutor_ids=[t_b1.id, t_t1.id], status=MeetingStatus.HELD, date=datetime(2026, 4, 10, 15, 0, tzinfo=timezone.utc), participants=[{"student_id": students[0].id, "attended": True}, {"student_id": students[1].id, "attended": True}], summary="Se ajustó el modelo de negocio y se definió el prototipo técnico.", notes="Propuesta de valor y ruteo.", next_steps="Ajustar BMC B2B.", hours_spent=2.5, links=[{"type": "Drive", "url": "https://drive.google.com/ecoroute-minuta-1"}]),
@@ -232,7 +244,7 @@ def seed_database(force: bool = False):
         ]
         db.add_all(meetings)
 
-        # 9. Crear Materiales de Apoyo (15 Materiales)
+        # 10. Crear Materiales de Apoyo (15 Materiales)
         print("- Creando Materiales de Apoyo (15)...")
         materials = [
             SupportMaterial(stage_id=stage_1.id, title="Plantilla de Mapa de Empatía", url="https://drive.google.com/template-empatia"),
@@ -254,7 +266,7 @@ def seed_database(force: bool = False):
         db.add_all(materials)
         db.flush()
 
-        # 10. Crear Documentos Polimórficos (15 Documentos)
+        # 11. Crear Documentos Polimórficos (15 Documentos)
         print("- Creando Documentos Polimórficos (15)...")
         documents = [
             Document(entity_type=EntityType.GROUP, entity_id=groups[0].id, url="https://drive.google.com/ecoroute-repo-general", platform=DocumentPlatform.DRIVE, order=1),
@@ -275,7 +287,7 @@ def seed_database(force: bool = False):
         ]
         db.add_all(documents)
 
-        # 11. Crear Comentarios (15 Comentarios)
+        # 12. Crear Comentarios (15 Comentarios)
         print("- Creando Comentarios (15)...")
         comments = [
             Comment(tutor_id=t_b1.id, deliverable_id=deliverables[0].id, content="Excelente trabajo en las entrevistas de validación. La muestra de 20 empresas fue muy representativa."),
