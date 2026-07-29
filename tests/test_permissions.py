@@ -72,11 +72,16 @@ MATRIZ = [
     ("PUT", "/api/materials", TUTORES),
     ("DELETE", "/api/materials/1", SOLO_COORD),
     # Meetings
-    ("GET", "/api/meetings", TUTORES),
+    ("GET", "/api/meetings", TODOS),
     ("GET", "/api/meetings/1", TODOS),
     ("PUT", "/api/meetings", TUTORES),
-    ("DELETE", "/api/meetings/1", SOLO_COORD),
+    ("DELETE", "/api/meetings/1", TUTORES),
     ("GET", "/api/groups/1/meetings/total-hours", TODOS),
+    # Checkpoints
+    ("GET", "/api/checkpoints", TODOS),
+    ("GET", "/api/checkpoints/my-pending", TODOS),
+    ("GET", "/api/checkpoints/1", TODOS),
+    ("PUT", "/api/checkpoints/1", TUTORES),
     # Dashboard
     ("GET", "/api/dashboard/summary", TUTORES),
 ]

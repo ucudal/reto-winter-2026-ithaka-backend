@@ -24,7 +24,7 @@ from app.core.security import (
     require_tutor_or_coordinator,
     verify_password,
 )
-from tests.conf_test import SECRET
+from tests.conftest import SECRET
 
 
 def _credenciales(token: str):

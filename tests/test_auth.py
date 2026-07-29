@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 import pytest
 
-from tests.conf_test import PASSWORD, SECRET, USUARIOS
+from tests.conftest import PASSWORD, SECRET, USUARIOS
 
 
 # --- login ---------------------------------------------------------------

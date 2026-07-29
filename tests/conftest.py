@@ -138,6 +138,7 @@ def sembrar_dominio(factory) -> None:
     from app.core.models.deliverable import Deliverable
     from app.core.models.document import Document
     from app.core.models.enums import DocumentPlatform, EntityType, TutorRole
+    from app.core.models.meeting import MeetingStatus
     from app.core.models.group import Group
     from app.core.models.meeting import Meeting
     from app.core.models.stage import Stage
@@ -181,6 +182,7 @@ def sembrar_dominio(factory) -> None:
             SupportMaterial(stage_id=etapa.id, title="Business Model Canvas",
                             url="https://drive.google.com/bmc"),
             Meeting(group_id=grupo.id, tutor_ids=[tutor_neg.id],
+                    status=MeetingStatus.HELD,
                     date=datetime(2026, 4, 10, 15, 0, tzinfo=timezone.utc),
                     participants=[], hours_spent=1.5, links=[]),
         ])
