@@ -10,20 +10,43 @@ from app.core.schemas.group import GroupUpsert
 
 class GroupRepository:
 
-    def list(self, db: Session, page: int = 1, page_size: int = 10) -> list[Group]:
+    def list(self,
+        db: Session,
+        page: int = 1,
+        page_size: int = 10,
+        cohort_id: int | None = None,
+        stage_id: int | None = None,
+        business_tutor_id: int | None = None,
+        technical_tutor_id: int | None = None,
+        status: str | None = None,
+        search: str | None = None,
+    ) -> list[Group]:
         offset = (page - 1) * page_size
-        statement = (
-            select(Group)
-            .options(
-                joinedload(Group.business_tutor),
-                joinedload(Group.technical_tutor),
-                joinedload(Group.current_stage),
-                joinedload(Group.cohort),
-                selectinload(Group.students)
-            )
-            .order_by(Group.name.asc(), Group.id.asc())
-            .offset(offset)
-            .limit(page_size)
+        statement = select(Group). options(
+            joinedload(Group.business_tutor),
+            joinedload(Group.technical_tutor),
+            joinedload(Group.current_stage),
+            joinedload(Group.cohort),
+            selectinload(Group.students),
+        )
+        
+        if cohort_id is not None:
+            statement = statement.where(Group.cohort_id == cohort_id)
+        if stage_id is not None:
+            statement = statement.where(Group.current_stage_id == stage_id)
+        if business_tutor_id is not None:
+            statement = statement.where(Group.business_tutor_id == business_tutor_id)
+        if technical_tutor_id is not None:
+            statement = statement.where(Group.technical_tutor_id == technical_tutor_id)
+        if status is not None:
+            statement = statement.where(Group.status == status)
+        if search is not None:
+            statement = statement.where(Group.name.ilike(f"%{search}%"))
+
+            statement = (
+                statement.order_by(Group.name.asc(), Group.id.asc())
+                .offset(offset)
+                .limit(page_size)
         )
         return list(db.scalars(statement).all())
 
