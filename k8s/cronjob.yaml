@@ -1,0 +1,48 @@
+# CronJob que genera los Checkpoints trimestrales.
+# Reutiliza la imagen del backend + el Secret (DATABASE_URL) + el ConfigMap del deployment.
+# Corre el script app/scripts/process_checkpoints.py de forma periódica.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ithaka-checkpoints
+  namespace: ithaka-backend
+spec:
+  # Trimestral: día 1 de ene/abr/jul/oct a las 06:00 UTC (03:00 en Uruguay, UTC-3).
+  # Formato: min hora día-del-mes mes día-de-semana
+  schedule: "0 6 1 1,4,7,10 *"
+  # timeZone: "America/Montevideo"   # descomentar si el cluster es k8s >= 1.27 y se quiere hora local
+  concurrencyPolicy: Forbid          # no solapar ejecuciones
+  startingDeadlineSeconds: 300       # si el cluster estaba caído, hasta 5 min de gracia para arrancar
+  successfulJobsHistoryLimit: 3      # conservar los últimos 3 jobs OK (para ver logs)
+  failedJobsHistoryLimit: 3          # y los últimos 3 fallidos
+  jobTemplate:
+    spec:
+      backoffLimit: 2                # reintenta hasta 2 veces si el script falla (sys.exit(1))
+      activeDeadlineSeconds: 600     # corta el job si tarda más de 10 min (evita colgarse)
+      template:
+        metadata:
+          labels:
+            app: ithaka-checkpoints
+        spec:
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: acr-secret
+          containers:
+            - name: checkpoints
+              # Misma imagen que el backend. Pinear por SHA es lo ideal (trazable);
+              # :latest funciona pero conviene actualizar el tag al de la versión desplegada.
+              image: crretoxmas2024.azurecr.io/ithaka-backend:latest
+              imagePullPolicy: IfNotPresent
+              command: ["python", "-m", "app.scripts.process_checkpoints"]
+              envFrom:
+                - configMapRef:
+                    name: ithaka-backend-config
+                - secretRef:
+                    name: ithaka-backend-secrets   # le da la DATABASE_URL
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "250Mi"
+                  cpu: "200m"
