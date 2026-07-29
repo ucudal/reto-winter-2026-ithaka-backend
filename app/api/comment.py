@@ -6,6 +6,7 @@ from app.core.schemas.comment import CommentUpsertRequest, CommentRead
 from app.core.services.comment_service import CommentService
 from app.core.security import require_authenticated, require_tutor_or_coordinator, require_coordinator
 
+
 router = APIRouter(tags=["Comments"])
 service = CommentService()
 
