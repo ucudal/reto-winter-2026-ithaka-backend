@@ -7,7 +7,8 @@ from app.core.db.session import get_db
 from app.core.models.user import User
 from app.core.security import (
     get_current_user,
-    require_authenticated
+    require_authenticated,
+    require_tutor_or_coordinator
 )
 
 from app.core.services.checkpoint_service import CheckpointService
@@ -49,7 +50,8 @@ def list_checkpoints(
 
 @router.get(
     "/my-pending",
-    response_model=list[CheckpointRead]
+    response_model=list[CheckpointRead],
+    dependencies=[Depends(require_authenticated)]
 )
 def my_pending(
     current_user:User=Depends(get_current_user),
@@ -66,7 +68,8 @@ def my_pending(
 
 @router.get(
     "/{id}",
-    response_model=CheckpointRead
+    response_model=CheckpointRead,
+    dependencies=[Depends(require_authenticated)]
 )
 def get_checkpoint(
     id:int,
@@ -83,7 +86,8 @@ def get_checkpoint(
 
 @router.put(
     "/{id}",
-    response_model=CheckpointRead
+    response_model=CheckpointRead,
+    dependencies=[Depends(require_tutor_or_coordinator)]
 )
 def update_checkpoint(
     id:int,
