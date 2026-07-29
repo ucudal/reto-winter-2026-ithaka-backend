@@ -193,10 +193,28 @@ def seed_database(force: bool = False):
 
         # 7. Crear Checkpoints (15 Checkpoints)
         print("- Creando Checkpoints (15)...")
+        default_questions_template = [
+            {"id": 1, "text": "¿Participaste en todas las reuniones de tutoría del equipo acordadas hasta la fecha?", "answer": None},
+            {"id": 2, "text": "¿Identificas algún bloqueo o dificultad técnica/de negocio en el desarrollo del proyecto?", "answer": None},
+            {"id": 3, "text": "Calificación general del progreso y compromiso del grupo (1 al 5)", "answer": None},
+        ]
+
         checkpoints = [
-            Checkpoint(group_id=groups[0].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - EcoRoute", due_date=date(2026, 7, 15), status="Pending", questions=[{"id": 1, "text": "¿El grupo tuvo asistencia regular?", "answer": None}, {"id": 2, "text": "¿El grupo tuvo avances esperados?", "answer": None}]),
-            Checkpoint(group_id=groups[1].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - HealthPulse", due_date=date(2026, 8, 10), status="Pending", questions=[{"id": 1, "text": "¿El grupo tuvo asistencia regular?", "answer": None}, {"id": 2, "text": "¿El grupo tuvo avances esperados?", "answer": None}]),
-            Checkpoint(group_id=groups[2].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - AgroSmart", due_date=date(2026, 9, 15), status="Pending", questions=[{"id": 1, "text": "¿Hubo avance técnico?", "answer": None}]),
+            Checkpoint(group_id=groups[0].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - EcoRoute", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[1].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - HealthPulse", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[2].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - AgroSmart", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[3].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - EduFlow", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[4].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - FinTrack", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[5].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - SolarGrid", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[6].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - BioPack", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[7].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - UrbanMobility", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[8].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - FoodWaste", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[9].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - CyberShield", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[10].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - NutriBot", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[11].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - WaterClean", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[12].id, cohort_id=cohort_active.id, title="Checkpoint trimestral - RecyclePay", due_date=date(2026, 8, 12), status="Pending", questions=default_questions_template),
+            Checkpoint(group_id=groups[13].id, cohort_id=cohorts[2].id, title="Checkpoint trimestral - SafeDrive", due_date=date(2025, 6, 30), status="Completed", questions=[{"id": 1, "text": "¿El grupo tuvo asistencia regular?", "answer": "Si"}, {"id": 2, "text": "¿Hubo bloqueos?", "answer": "No"}, {"id": 3, "text": "Calificación", "answer": "5"}]),
+            Checkpoint(group_id=groups[14].id, cohort_id=cohorts[3].id, title="Checkpoint trimestral - CargoFly", due_date=date(2025, 11, 30), status="Completed", questions=[{"id": 1, "text": "¿El grupo tuvo asistencia regular?", "answer": "Si"}, {"id": 2, "text": "¿Hubo bloqueos?", "answer": "No"}, {"id": 3, "text": "Calificación", "answer": "4"}]),
         ]
         db.add_all(checkpoints)
         db.flush()
