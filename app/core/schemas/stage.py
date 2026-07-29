@@ -33,8 +33,7 @@ class StageUpsert(StageBase):
 class StageRead(StageBase):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ExpectedDeliverableRead(BaseModel):
@@ -43,5 +42,4 @@ class ExpectedDeliverableRead(BaseModel):
     expected_date: date
     status: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

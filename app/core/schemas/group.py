@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.core.schemas.tutor import TutorRead
 from app.core.schemas.stage import StageRead
 from app.core.schemas.student import StudentRead
@@ -33,8 +33,7 @@ class GroupResponse(BaseModel):
     students: list[StudentRead] = []
     cohort: CohortRead | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class GroupStageUpdate(BaseModel):

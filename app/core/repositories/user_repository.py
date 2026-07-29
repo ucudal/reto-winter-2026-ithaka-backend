@@ -35,19 +35,28 @@ class UserRepository:
         )
         return self.db.execute(stmt).scalar_one_or_none()
 
-    def list_all(self, *, role: UserRole | None = None, name_search: str | None = None, page: int = 1, page_size: int = 10) -> list[User]:
-        stmt = select(User)
+    def list_all(self, *, role: UserRole | None = None, name_search: str | None = None, page: int = 1, page_size: int = 10) -> tuple[list[User], int]:
+        # Get total count
+        count_stmt = select(User)
+        if role is not None:
+            count_stmt = count_stmt.where(User.role == role)
+        if name_search is not None:
+            count_stmt = count_stmt.where(User.name.ilike(f"%{name_search}%"))
+        total = self.db.execute(count_stmt).scalars().count()
         
+        # Get paginated items
+        stmt = select(User)
         if role is not None:
             stmt = stmt.where(User.role == role)
-        
         if name_search is not None:
             stmt = stmt.where(User.name.ilike(f"%{name_search}%"))
         
         stmt = stmt.order_by(User.id)
         offset = (page - 1) * page_size
         stmt = stmt.offset(offset).limit(page_size)
-        return list(self.db.execute(stmt).scalars().all())
+        items = list(self.db.execute(stmt).scalars().all())
+        
+        return items, total
 
     def create(
         self,
