@@ -4,6 +4,7 @@ from datetime import date
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import joinedload
 
 from app.core.models.deliverable import Deliverable
 
@@ -22,6 +23,7 @@ class DeliverableRepository:
         return list(
             self.db.scalars(
                 select(Deliverable)
+                .options(joinedload(Deliverable.stage))
                 .order_by(Deliverable.id.asc())
                 .offset(offset)
                 .limit(page_size)
@@ -29,7 +31,11 @@ class DeliverableRepository:
         )
 
     def get_by_id(self, deliverable_id: int) -> Deliverable | None:
-        return self.db.get(Deliverable, deliverable_id)
+        return self.db.get(
+            select(Deliverable)
+            .options(joinedload(Deliverable.stage))
+            .where(Deliverable.id == deliverable_id)
+        )
 
     def update(self, deliverable: Deliverable, data: dict) -> Deliverable:
         for field, value in data.items():
@@ -39,12 +45,19 @@ class DeliverableRepository:
         return deliverable
 
     def get_by_status(self, status: str) -> list[Deliverable]:
-        return list(self.db.scalars(select(Deliverable).where(Deliverable.status == status)))
+        return list(
+            self.db.scalars(
+                select(Deliverable)
+                .options(joinedload(Deliverable.stage))
+                .where(Deliverable.status == status)
+            )
+        )
 
     def get_by_group(self, group_id: int) -> list[Deliverable]:
         return list(
             self.db.scalars(
                 select(Deliverable)
+                .options(joinedload(Deliverable.stage))
                 .where(Deliverable.group_id == group_id)
                 .order_by(Deliverable.expected_date.asc())
             )
@@ -63,4 +76,10 @@ class DeliverableRepository:
         if group_ids is not None:
             conditions.append(Deliverable.group_id.in_(group_ids))
 
-        return list(self.db.scalars(select(Deliverable).where(*conditions)))
+        return list(
+            self.db.scalars(
+                select(Deliverable)
+                .options(joinedload(Deliverable.stage))
+                .where(*conditions)
+            )
+        )

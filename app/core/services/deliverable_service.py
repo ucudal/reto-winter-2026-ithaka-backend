@@ -16,9 +16,20 @@ class DeliverableService:
     def __init__(self, db: Session):
         self.repository = DeliverableRepository(db)
 
+    @staticmethod
+    def _to_read(deliverable):
+        return DeliverableRead(
+            id=deliverable.id,
+            group_id=deliverable.group_id,
+            stage_id=deliverable.stage_id,
+            stage_name=deliverable.stage.name,
+            expected_date=deliverable.expected_date,
+            status=deliverable.status,
+        )
+
     def get_all(self, page: int = 1, page_size: int = 10) -> list[DeliverableRead]:
         deliverables = self.repository.get_all(page=page, page_size=page_size)
-        return [DeliverableRead.model_validate(d) for d in deliverables]
+        return [self._to_read(d) for d in deliverables]
 
     def get_by_id(self, deliverable_id: int) -> DeliverableRead:
         deliverable = self.repository.get_by_id(deliverable_id)
@@ -26,7 +37,7 @@ class DeliverableService:
             raise HTTPException(
                 status_code=http_status.HTTP_404_NOT_FOUND, detail="Deliverable not found"
             )
-        return DeliverableRead.model_validate(deliverable)
+        return self._to_read(deliverable)
 
     def update(self, data: DeliverableUpdate) -> DeliverableRead:
         deliverable = self.repository.get_by_id(data.id)
@@ -44,15 +55,15 @@ class DeliverableService:
             )
 
         updated = self.repository.update(deliverable, update_data)
-        return DeliverableRead.model_validate(updated)
+        return self._to_read(updated)
 
     def get_pending(self) -> list[DeliverableRead]:
         deliverables = self.repository.get_by_status("Pending")
-        return [DeliverableRead.model_validate(d) for d in deliverables]
+        return [self._to_read(d) for d in deliverables]
 
     def get_overdue(self) -> list[DeliverableRead]:
         deliverables = self.repository.get_overdue(date.today())
-        return [DeliverableRead.model_validate(d) for d in deliverables]
+        return [self._to_read(d) for d in deliverables]
 
 
 def get_deliverable_service(db: Session = Depends(get_db)) -> DeliverableService:
