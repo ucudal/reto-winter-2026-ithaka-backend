@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.db.session import get_db
 from app.core.schemas.document import DocumentRead, DocumentUpsertRequest
 from app.core.services.document_service import DocumentService
+from app.core.security import require_authenticated, require_tutor_or_coordinator, require_coordinator
 
 router = APIRouter(
     prefix="/api",
@@ -15,7 +16,7 @@ def get_document_service() -> DocumentService:
     return DocumentService()
 
 
-@router.get("/groups/{group_id}/documents", response_model=list[DocumentRead])
+@router.get("/groups/{group_id}/documents", response_model=list[DocumentRead], dependencies=[Depends(require_authenticated)])
 def list_group_documents(
     group_id: int,
     db: Session = Depends(get_db),
@@ -24,7 +25,7 @@ def list_group_documents(
     return service.list_group_documents(db, group_id)
 
 
-@router.put("/groups/{group_id}/documents", response_model=DocumentRead)
+@router.put("/groups/{group_id}/documents", response_model=DocumentRead, dependencies=[Depends(require_tutor_or_coordinator)])
 def upsert_group_document(
     group_id: int,
     payload: DocumentUpsertRequest,
@@ -34,7 +35,7 @@ def upsert_group_document(
     return service.upsert_group_document(db, group_id, payload)
 
 
-@router.get("/deliverables/{deliverable_id}/documents", response_model=list[DocumentRead])
+@router.get("/deliverables/{deliverable_id}/documents", response_model=list[DocumentRead], dependencies=[Depends(require_authenticated)])
 def list_deliverable_documents(
     deliverable_id: int,
     db: Session = Depends(get_db),
@@ -43,7 +44,7 @@ def list_deliverable_documents(
     return service.list_deliverable_documents(db, deliverable_id)
 
 
-@router.put("/deliverables/{deliverable_id}/documents", response_model=DocumentRead)
+@router.put("/deliverables/{deliverable_id}/documents", response_model=DocumentRead, dependencies=[Depends(require_tutor_or_coordinator)])
 def upsert_deliverable_document(
     deliverable_id: int,
     payload: DocumentUpsertRequest,
@@ -53,7 +54,7 @@ def upsert_deliverable_document(
     return service.upsert_deliverable_document(db, deliverable_id, payload)
 
 
-@router.delete("/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/documents/{document_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(require_coordinator)])
 def delete_document(
     document_id: int,
     db: Session = Depends(get_db),

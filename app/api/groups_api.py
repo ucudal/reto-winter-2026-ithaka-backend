@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.core.db.session import get_db
 
@@ -23,14 +23,16 @@ def get_group_service() -> GroupService:
 @router.get("", response_model=list[GroupResponse])
 def list_groups(
     current_user: User = Depends(get_current_user),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
     service: GroupService = Depends(get_group_service),
 ):
     """Lista grupos. Coordinator ve todos, tutor ve los suyos, alumno ve el propio."""
-    return service.list_groups(db, current_user)
+    return service.list_groups(db, current_user, page=page, page_size=page_size)
 
 
-@router.get("/{group_id}", response_model=GroupResponse)
+@router.get("/{group_id}")
 def get_group(
     group_id: int,
     current_user: User = Depends(get_current_user),

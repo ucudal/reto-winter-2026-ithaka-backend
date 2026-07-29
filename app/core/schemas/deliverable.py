@@ -11,6 +11,7 @@ class DeliverableRead(BaseModel):
     id: int | None = None
     group_id: int
     stage_id: int
+    stage_name: str
     expected_date: date
     status: str
 

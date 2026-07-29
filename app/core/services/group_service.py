@@ -22,9 +22,11 @@ class GroupService:
         self.cohort_repository = CohortRepository()
         self.repository = repository or GroupRepository()
 
-    def list_groups(self, db: Session, current_user: User) -> list[GroupResponse]:
+    def list_groups(self, db: Session, current_user: User, page: int = 1, page_size: int = 10) -> list[GroupResponse]:
         groups = self.repository.list(db)
         groups = filter_groups_for_user(groups, current_user)
+        start = (page - 1) * page_size
+        groups = groups[start : start + page_size]
         return [GroupResponse.model_validate(g, from_attributes=True) for g in groups]
 
     def get_group(self, db: Session, group_id: int, current_user: User) -> GroupResponse:

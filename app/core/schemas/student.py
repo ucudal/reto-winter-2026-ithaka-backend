@@ -1,3 +1,4 @@
+
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -30,3 +31,10 @@ class StudentRead(StudentBase):
     linkedin_url: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+class StudentListResponse(BaseModel):
+    items: list[StudentRead]
+    total_items: int
+    page: int
+    page_size: int
+

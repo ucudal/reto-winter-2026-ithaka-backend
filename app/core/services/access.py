@@ -27,6 +27,25 @@ def user_can_access_group(group: Group, user: User) -> bool:
     return False
 
 
+def user_can_manage_group(group: Group, user: User) -> bool:
+    """Coordinator o el tutor (business/technical) asignado a ese grupo.
+
+    A diferencia de `user_can_access_group`, NO incluye a los alumnos: se usa
+    para acciones de gestion sobre datos de un grupo (ej. cargar reuniones),
+    no para simple lectura.
+    """
+    if user.role == UserRole.COORDINATOR:
+        return True
+
+    if user.role in (UserRole.BUSINESS_TUTOR, UserRole.TECHNICAL_TUTOR):
+        return (
+            (group.business_tutor and group.business_tutor.user_id == user.id)
+            or (group.technical_tutor and group.technical_tutor.user_id == user.id)
+        )
+
+    return False
+
+
 def filter_groups_for_user(groups: list[Group], user: User) -> list[Group]:
     """Filtra una lista de grupos dejando solo los que `user` puede ver."""
     return [group for group in groups if user_can_access_group(group, user)]
