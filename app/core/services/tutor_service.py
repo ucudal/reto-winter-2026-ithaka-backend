@@ -9,8 +9,14 @@ from app.core.schemas.tutor import TutorRead, TutorUpsertRequest
 
 class TutorService:
 
-    def __init__(self):
-        self.repo = TutorRepository()
+    def __init__(self, repository: TutorRepository | None = None):
+        self.repo = repository or TutorRepository()
+
+    def _to_read(self, tutor: Tutor) -> TutorRead:
+        return TutorRead.model_validate(
+            tutor,
+            from_attributes=True,
+        )
 
     def list_tutors(
         self,
@@ -20,10 +26,18 @@ class TutorService:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> list[Tutor]:
-        return self.repo.list(
-            db, role=role, status=status, search=search, page=page, page_size=page_size
+    ) -> list[TutorRead]:
+
+        tutors = self.repo.list(
+            db,
+            role=role,
+            status=status,
+            search=search,
+            page=page,
+            page_size=page_size,
         )
+
+        return [self._to_read(tutor) for tutor in tutors]
 
     def get_tutor(self, db: Session, tutor_id: int) -> Tutor:
         tutor = self.repo.get_by_id(db, tutor_id)
