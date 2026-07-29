@@ -4,6 +4,9 @@ from sqlalchemy import Date, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db.base import Base
+from app.core.models.checkpoint import Checkpoint
+from app.core.models.group import Group
+from app.core.models.stage import Stage
 
 
 class Cohort(Base):
@@ -24,3 +27,8 @@ class Cohort(Base):
     stages: Mapped[list["Stage"]] = relationship(
         back_populates="cohort", cascade="all, delete-orphan"
     )
+    checkpoints: Mapped[list["Checkpoint"]] = relationship(
+        back_populates="cohort",
+        cascade="all, delete-orphan"
+    )
+    
