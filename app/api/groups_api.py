@@ -22,14 +22,31 @@ def get_group_service() -> GroupService:
 
 @router.get("", response_model=list[GroupResponse])
 def list_groups(
+cohort_id: int | None = Query(None),
+    stage_id: int | None = Query(None),
+    business_tutor_id: int | None = Query(None),
+    technical_tutor_id: int | None = Query(None),
+    status: str | None = Query(None),
+    search: str | None = Query(None),
     current_user: User = Depends(get_current_user),
     page: int = Query(1, ge=1),
     page_size: int = Query(10, ge=1, le=100),
     db: Session = Depends(get_db),
-    service: GroupService = Depends(get_group_service),
+    service: GroupService = Depends(get_group_service)
 ):
     """Lista grupos. Coordinator ve todos, tutor ve los suyos, alumno ve el propio."""
-    return service.list_groups(db, current_user, page=page, page_size=page_size)
+    return service.list_groups(
+        db,
+        current_user,
+        page=page,
+        page_size=page_size,
+        cohort_id=cohort_id,
+        stage_id=stage_id,
+        business_tutor_id=business_tutor_id,
+        technical_tutor_id=technical_tutor_id,
+        status=status,
+        search=search,
+    )
 
 
 @router.get("/{group_id}")
