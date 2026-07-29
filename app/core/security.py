@@ -23,6 +23,7 @@ from app.core.repositories.user_repository import UserRepository
 # cuando falta el header Authorization.
 bearer_scheme = HTTPBearer(auto_error=False)
 
+
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail="Could not validate credentials",
@@ -48,15 +49,16 @@ def verify_password(plain_password: str, password_hash: str) -> bool:
 
 
 def create_access_token(
-    subject: str, expires_delta: timedelta | None = None
+    subject: User, extra_claims: dict | None = None, expires_delta: timedelta | None = None,
 ) -> str:
     """Crea un JWT firmado cuyo claim `sub` identifica al usuario."""
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     payload = {"sub": subject, "exp": expire}
+    if extra_claims:
+        payload.update(extra_claims)
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
 
 def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
@@ -94,3 +96,15 @@ def require_roles(*roles: UserRole):
         return current_user
 
     return dependency
+
+
+require_coordinator = require_roles(UserRole.COORDINATOR)
+
+
+require_tutor_or_coordinator = require_roles(
+    UserRole.COORDINATOR,
+    UserRole.BUSINESS_TUTOR,
+    UserRole.TECHNICAL_TUTOR,
+)
+
+require_authenticated = get_current_user

@@ -32,7 +32,7 @@ def list_groups(
     return service.list_groups(db, current_user, page=page, page_size=page_size)
 
 
-@router.get("/{group_id}", response_model=GroupResponse)
+@router.get("/{group_id}")
 def get_group(
     group_id: int,
     current_user: User = Depends(get_current_user),
