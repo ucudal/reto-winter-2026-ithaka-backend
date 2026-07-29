@@ -36,6 +36,12 @@ class Group(Base):
         foreign_keys=[technical_tutor_id],
         back_populates="groups_as_technical_tutor",
     )
+    tutor_assignments: Mapped[list["TutorGroupAssignment"]] = relationship(
+        back_populates="group", cascade="all, delete-orphan"
+    )
+    student_memberships: Mapped[list["StudentGroupMembership"]] = relationship(
+        back_populates="group", cascade="all, delete-orphan"
+    )
     students: Mapped[list["Student"]] = relationship(
         back_populates="group", cascade="all, delete-orphan"
     )
