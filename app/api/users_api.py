@@ -5,7 +5,7 @@ from app.core.db.session import get_db
 from app.core.models.enums import UserRole
 from app.core.models.user import User
 from app.core.repositories.user_repository import UserRepository
-from app.core.schemas.user import UserCreate, UserRead, UserUpdate
+from app.core.schemas.user import UserCreate, UserRead, UserUpdate, PaginatedUserResponse
 from app.core.security import get_current_user, require_roles
 from app.core.services.auth_service import AuthService
 
@@ -20,7 +20,7 @@ def read_current_user(
     return current_user
 
 
-@router.get("", response_model=list[UserRead])
+@router.get("", response_model=PaginatedUserResponse)
 def list_users(
     _: User = Depends(require_roles(UserRole.COORDINATOR)),
     db: Session = Depends(get_db),
@@ -28,9 +28,10 @@ def list_users(
     name_search: str | None = Query(None, description="Search by name (partial match)"),
     page: int = Query(1, ge=1, description="Page number"),
     page_size: int = Query(10, ge=1, le=100, description="Page size"),
-) -> list[User]:
+) -> PaginatedUserResponse:
     """Lista todos los usuarios. Solo para Coordinator. Soporta filtrado por rol y búsqueda por nombre."""
-    return UserRepository(db).list_all(role=role, name_search=name_search, page=page, page_size=page_size)
+    items, total = UserRepository(db).list_all(role=role, name_search=name_search, page=page, page_size=page_size)
+    return PaginatedUserResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 @router.post(

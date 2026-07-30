@@ -20,9 +20,12 @@ def get_group_service() -> GroupService:
     return GroupService()
 
 
-@router.get("", response_model=list[GroupResponse])
+from app.core.schemas.pagination import PaginatedResponse
+
+
+@router.get("", response_model=PaginatedResponse[GroupResponse])
 def list_groups(
-cohort_id: int | None = Query(None),
+    cohort_id: int | None = Query(None),
     stage_id: int | None = Query(None),
     business_tutor_id: int | None = Query(None),
     technical_tutor_id: int | None = Query(None),
@@ -35,7 +38,7 @@ cohort_id: int | None = Query(None),
     service: GroupService = Depends(get_group_service)
 ):
     """Lista grupos. Coordinator ve todos, tutor ve los suyos, alumno ve el propio."""
-    return service.list_groups(
+    items, total = service.list_groups(
         db,
         current_user,
         page=page,
@@ -47,6 +50,7 @@ cohort_id: int | None = Query(None),
         status=status,
         search=search,
     )
+    return PaginatedResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 @router.get("/{group_id}")

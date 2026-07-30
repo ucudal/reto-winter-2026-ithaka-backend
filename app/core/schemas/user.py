@@ -47,3 +47,10 @@ class LoginUser(BaseModel):
 class LoginResponse(BaseModel):
     token: str
     user: LoginUser
+
+
+class PaginatedUserResponse(BaseModel):
+    items: list[UserRead]
+    total: int
+    page: int
+    page_size: int

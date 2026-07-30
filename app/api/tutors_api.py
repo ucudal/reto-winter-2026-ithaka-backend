@@ -13,7 +13,10 @@ def get_tutor_service() -> TutorService:
     return TutorService()
 
 
-@router.get("", response_model=list[TutorRead], dependencies=[Depends(require_authenticated)])
+from app.core.schemas.pagination import PaginatedResponse
+
+
+@router.get("", response_model=PaginatedResponse[TutorRead], dependencies=[Depends(require_authenticated)])
 def list_tutors(
     role: TutorRole | None = Query(None),
     status: str | None = Query(None),
@@ -23,7 +26,7 @@ def list_tutors(
     db: Session = Depends(get_db),
     service: TutorService = Depends(get_tutor_service),
 ):
-    return service.list_tutors(
+    items, total = service.list_tutors(
         db,
         role=role,
         status=status,
@@ -31,6 +34,7 @@ def list_tutors(
         page=page,
         page_size=page_size,
     )
+    return PaginatedResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 @router.get("/overloaded", response_model=list[TutorCapacityRead], dependencies=[Depends(require_coordinator)],)
