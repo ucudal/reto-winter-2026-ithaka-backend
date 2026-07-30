@@ -32,10 +32,11 @@ class AuthService:
     def login(self, email: str, password: str) -> tuple[User, str]:
         """Autentica y devuelve el usuario junto con un token firmado."""
         user = self.authenticate(email, password)
+        role_str = user.role.value if hasattr(user.role, "value") else str(user.role)
         token = create_access_token(
             subject=str(user.id), 
             extra_claims={
-                "role": user.role.value, 
+                "role": role_str, 
                 "name": user.name, 
                 "email": user.email})
         return user, token

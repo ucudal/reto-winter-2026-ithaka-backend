@@ -34,8 +34,8 @@ class GroupService:
             technical_tutor_id: int | None = None,
             status: str | None = None,
             search: str | None = None,
-        ) -> list[GroupResponse]:
-            groups = self.repository.list(
+        ) -> tuple[list[GroupResponse], int]:
+            all_groups = self.repository.list(
                 db,
                 page=None,
                 page_size=None,
@@ -46,10 +46,12 @@ class GroupService:
                 status=status,
                 search=search,
             )
-            groups = filter_groups_for_user(groups, current_user)
+            filtered = filter_groups_for_user(all_groups, current_user)
+            total = len(filtered)
             start = (page - 1) * page_size
-            groups = groups[start : start + page_size]
-            return [GroupResponse.model_validate(g, from_attributes=True) for g in groups]
+            paginated = filtered[start : start + page_size]
+            items = [GroupResponse.model_validate(g, from_attributes=True) for g in paginated]
+            return items, total
 
     def get_group(self, db: Session, group_id: int, current_user: User) -> GroupResponse:
         group = self._get_or_404(db, group_id)

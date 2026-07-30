@@ -18,7 +18,10 @@ def get_cohort_service() -> CohortService:
     return CohortService()
 
 
-@router.get("", response_model=list[CohortRead], dependencies=[Depends(require_authenticated)])
+from app.core.schemas.pagination import PaginatedResponse
+
+
+@router.get("", response_model=PaginatedResponse[CohortRead], dependencies=[Depends(require_authenticated)])
 def list_cohorts(
     year: int | None = Query(None),
     semester: int | None = Query(None),
@@ -30,7 +33,8 @@ def list_cohorts(
     service: CohortService = Depends(get_cohort_service),
 ):
     """Lista cohortes. Requiere estar autenticado."""
-    return service.list_cohorts(db, year=year, semester=semester, status=status, page=page, page_size=page_size)
+    items, total = service.list_cohorts(db, year=year, semester=semester, status=status, page=page, page_size=page_size)
+    return PaginatedResponse(items=items, total=total, page=page, page_size=page_size)
 
 
 @router.get("/{cohort_id}", response_model=CohortRead, dependencies=[Depends(require_authenticated)])

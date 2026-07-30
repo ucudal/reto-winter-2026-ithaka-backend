@@ -1,5 +1,4 @@
-from __future__ import annotations
-from sqlalchemy import select, text
+from sqlalchemy import select, func, text
 from sqlalchemy.orm import Session
 from app.core.models.support_material import SupportMaterial
 from app.core.schemas.support_material import SupportMaterialUpsertRequest
@@ -13,9 +12,15 @@ class SupportMaterialRepository:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> list[SupportMaterial]:
-        statement = select(SupportMaterial)
+    ) -> tuple[list[SupportMaterial], int]:
+        count_stmt = select(func.count(SupportMaterial.id))
+        if stage_id is not None:
+            count_stmt = count_stmt.where(SupportMaterial.stage_id == stage_id)
+        if search is not None:
+            count_stmt = count_stmt.where(SupportMaterial.title.ilike(f"%{search}%"))
+        total = db.execute(count_stmt).scalar() or 0
 
+        statement = select(SupportMaterial)
         if stage_id is not None:
             statement = statement.where(SupportMaterial.stage_id == stage_id)
         if search is not None:
@@ -24,11 +29,11 @@ class SupportMaterialRepository:
         statement = statement.order_by(
             SupportMaterial.stage_id.asc(), SupportMaterial.id.asc()
         )
-
         offset = (page - 1) * page_size
         statement = statement.offset(offset).limit(page_size)
 
-        return list(db.scalars(statement).all())
+        items = list(db.scalars(statement).all())
+        return items, total
 
     def get_by_id(self, db: Session, material_id: int) -> SupportMaterial | None:
         return db.get(SupportMaterial, material_id)
