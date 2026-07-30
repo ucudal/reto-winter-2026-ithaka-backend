@@ -446,3 +446,4 @@ def test_get_group_not_found(db, repo):
     result = repo.get_group(db, 999)
 
     assert result is None
+    
