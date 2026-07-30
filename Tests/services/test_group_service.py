@@ -18,7 +18,7 @@ def mock_repository():
 @pytest.fixture()
 def service(mock_repository):
     s = GroupService(repository=mock_repository)
-    s.cohort_repository = MagicMock()  # el __init__ crea uno real; lo reemplazamos
+    s.cohort_repository = MagicMock()
     return s
 
 
