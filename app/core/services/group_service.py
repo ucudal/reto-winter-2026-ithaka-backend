@@ -112,7 +112,8 @@ class GroupService:
         group = self._get_or_404(db, group_id)
         self._ensure_access(group, current_user)
         deliverables = DeliverableRepository(db).get_by_group(group_id)
-        return [DeliverableRead.model_validate(d) for d in deliverables]
+        from app.core.services.deliverable_service import DeliverableService
+        return [DeliverableService._to_read(d) for d in deliverables]
 
     def _ensure_access(self, group, current_user: User) -> None:
         """Verifica que el usuario tenga permiso sobre ESTE grupo puntual."""
