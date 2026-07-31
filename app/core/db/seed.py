@@ -39,36 +39,43 @@ def seed_database(force: bool = False):
 
         default_pwd_hash = hash_password("password")
 
-        # 1. Crear Usuarios (25 Usuarios: 1 Coord, 8 Tutores, 16 Estudiantes)
-        print("- Creando Usuarios (25)...")
+        # 1. Crear Usuarios (29 Usuarios: 1 Coord (DT), 8 Tutores, 20 Estudiantes)
+        # Nombres tomados del plantel/DT de la Selección Uruguaya de fútbol.
+        print("- Creando Usuarios (29)...")
         users = [
-            User(name="Sofía Martínez", email="coord@ithaka.ucu.edu.uy", role=UserRole.COORDINATOR, password_hash=default_pwd_hash),
+            User(name="Marcelo Bielsa", email="marcelo.bielsa@ithaka.ucu.edu.uy", role=UserRole.COORDINATOR, password_hash=default_pwd_hash),
             # Tutores
-            User(name="María Pérez", email="maria.perez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
-            User(name="Diego Ramírez", email="diego.ramirez@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
-            User(name="Lucía Gómez", email="lucia.gomez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
-            User(name="Carlos Alcaraz", email="carlos.alcaraz@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
-            User(name="Elena Rostova", email="elena.rostova@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
-            User(name="Fernando Torres", email="fernando.torres@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
-            User(name="Patricia Suárez", email="patricia.suarez@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
-            User(name="Gonzalo Méndez", email="gonzalo.mendez@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
+            User(name="Diego Godín", email="diego.godin@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
+            User(name="Fernando Muslera", email="fernando.muslera@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
+            User(name="Diego Forlán", email="diego.forlan@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
+            User(name="Álvaro Recoba", email="alvaro.recoba@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
+            User(name="Enzo Francescoli", email="enzo.francescoli@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
+            User(name="Rubén Sosa", email="ruben.sosa@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
+            User(name="Paolo Montero", email="paolo.montero@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
+            User(name="Gustavo Poyet", email="gustavo.poyet@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
             # Estudiantes
-            User(name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Mateo Silva", email="mateo.silva@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Camila Torres", email="camila.torres@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Joaquín Olivera", email="joaquin.olivera@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Valentina Morales", email="valentina.morales@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Gabriel Méndez", email="gabriel.mendez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Isabella Castro", email="isabella.castro@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Federico Valverde", email="federico.valverde@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
             User(name="Rodrigo Bentancur", email="rodrigo.bentancur@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Martina Domínguez", email="martina.dominguez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Nicolás Acosta", email="nicolas.acosta@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Sofía Cabrera", email="sofia.cabrera@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Tomás Roldán", email="tomas.roldan@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Florencia Paz", email="florencia.paz@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Agustín Benítez", email="agustin.benitez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Luciana Vega", email="luciana.vega@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Ronald Araújo", email="ronald.araujo@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Darwin Núñez", email="darwin.nunez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Facundo Pellistri", email="facundo.pellistri@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Manuel Ugarte", email="manuel.ugarte@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Giorgian De Arrascaeta", email="giorgian.dearrascaeta@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Nahitan Nández", email="nahitan.nandez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Matías Vecino", email="matias.vecino@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Nicolás de la Cruz", email="nicolas.delacruz@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Mathías Olivera", email="mathias.olivera@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Guillermo Varela", email="guillermo.varela@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Maximiliano Araújo", email="maximiliano.araujo@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Agustín Canobbio", email="agustin.canobbio@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Brian Rodríguez", email="brian.rodriguez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Facundo Torres", email="facundo.torres@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            # Estudiante de demo: usado en el flujo de demo (grupo sin tutor -> asignar tutor -> crear reunion -> ver reunion como estudiante)
+            User(name="Sergio Rochet", email="demo.estudiante@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            # Estudiantes sin grupo asignado (para probar el flujo de asignación de alumnos a un grupo nuevo)
+            User(name="Santiago Bueno", email="santiago.bueno@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Sebastián Cáceres", email="sebastian.caceres@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            User(name="Facundo González", email="facundo.gonzalez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
         ]
         db.add_all(users)
         db.flush()
@@ -76,6 +83,8 @@ def seed_database(force: bool = False):
         u_coord = users[0]
         tutor_users = users[1:9]
         student_users = users[9:25]
+        demo_student_user = users[25]
+        unassigned_student_users = users[26:29]
 
         # 2. Crear Cohortes (15 Cohortes)
         print("- Creando Cohortes (15)...")
@@ -126,28 +135,28 @@ def seed_database(force: bool = False):
         # 4. Crear Tutores (15 Tutores)
         print("- Creando Tutores (15)...")
         tutors = [
-            Tutor(user_id=tutor_users[0].id, name="María Pérez", role=TutorRole.BUSINESS, specialty="Modelos SaaS & Finanzas", max_capacity=60, availability="Lunes y Miércoles 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/maria-perez-ithaka"),
-            Tutor(user_id=tutor_users[1].id, name="Diego Ramírez", role=TutorRole.TECHNICAL, specialty="Arquitectura Cloud & Mobile", max_capacity=40, availability="Martes y Jueves 09:00-13:00", status="Active", linkedin_url="https://www.linkedin.com/in/diego-ramirez-ithaka"),
-            Tutor(user_id=tutor_users[2].id, name="Lucía Gómez", role=TutorRole.BUSINESS, specialty="Marketing & Validación", max_capacity=50, availability="Viernes 10:00-16:00", status="Active", linkedin_url="https://www.linkedin.com/in/lucia-gomez-ithaka"),
-            Tutor(user_id=tutor_users[3].id, name="Carlos Alcaraz", role=TutorRole.TECHNICAL, specialty="Ciberseguridad & DevSecOps", max_capacity=30, availability="Lunes y Viernes 09:00-12:00", status="Active", linkedin_url="https://www.linkedin.com/in/carlos-alcaraz-ithaka"),
-            Tutor(user_id=tutor_users[4].id, name="Elena Rostova", role=TutorRole.BUSINESS, specialty="Estrategia Comercial B2B", max_capacity=45, availability="Miércoles y Jueves 15:00-19:00", status="Active", linkedin_url="https://www.linkedin.com/in/elena-rostova-ithaka"),
-            Tutor(user_id=tutor_users[5].id, name="Fernando Torres", role=TutorRole.BUSINESS, specialty="Propiedad Intelectual", max_capacity=20, availability="Martes 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/fernando-torres-ithaka"),
-            Tutor(user_id=tutor_users[6].id, name="Patricia Suárez", role=TutorRole.TECHNICAL, specialty="Inteligencia Artificial & Datos", max_capacity=35, availability="Lunes 10:00-14:00", status="Active", linkedin_url="https://www.linkedin.com/in/patricia-suarez-ithaka"),
-            Tutor(user_id=tutor_users[7].id, name="Gonzalo Méndez", role=TutorRole.BUSINESS, specialty="Finanzas Corporativas & Pitch", max_capacity=50, availability="Jueves 10:00-16:00", status="Active", linkedin_url=None),
-            Tutor(name="Valentina Ríos", role=TutorRole.TECHNICAL, specialty="Diseño UX/UI & Prototipado", max_capacity=40, availability="Miércoles 09:00-15:00", status="Active", linkedin_url=None),
-            Tutor(name="Esteban Benítez", role=TutorRole.BUSINESS, specialty="Desarrollo Internacional", max_capacity=25, availability="Viernes 14:00-18:00", status="Active", linkedin_url=None),
-            Tutor(name="Romina Franco", role=TutorRole.TECHNICAL, specialty="DevOps & Infraestructura", max_capacity=30, availability="Lunes 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/romina-franco"),
-            Tutor(name="Ignacio Varela", role=TutorRole.BUSINESS, specialty="Levantamiento de Capital", max_capacity=40, availability="Martes 10:00-14:00", status="Active", linkedin_url=None),
-            Tutor(name="Camila Paez", role=TutorRole.BUSINESS, specialty="Growth Hacking & Analytics", max_capacity=35, availability="Jueves 14:00-18:00", status="Inactive", linkedin_url=None),
-            Tutor(name="Matías Soria", role=TutorRole.TECHNICAL, specialty="Blockchain & Smart Contracts", max_capacity=30, availability="Viernes 09:00-13:00", status="Inactive", linkedin_url=None),
-            Tutor(name="Victoria Morales", role=TutorRole.BUSINESS, specialty="Liderazgo & Gestión de Equipos", max_capacity=50, availability="Miércoles 10:00-16:00", status="Inactive", linkedin_url=None),
+            Tutor(user_id=tutor_users[0].id, name="Diego Godín", role=TutorRole.BUSINESS, specialty="Modelos SaaS & Finanzas", max_capacity=60, availability="Lunes y Miércoles 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/diego-godin-ithaka"),
+            Tutor(user_id=tutor_users[1].id, name="Fernando Muslera", role=TutorRole.TECHNICAL, specialty="Arquitectura Cloud & Mobile", max_capacity=40, availability="Martes y Jueves 09:00-13:00", status="Active", linkedin_url="https://www.linkedin.com/in/fernando-muslera-ithaka"),
+            Tutor(user_id=tutor_users[2].id, name="Diego Forlán", role=TutorRole.BUSINESS, specialty="Marketing & Validación", max_capacity=50, availability="Viernes 10:00-16:00", status="Active", linkedin_url="https://www.linkedin.com/in/diego-forlan-ithaka"),
+            Tutor(user_id=tutor_users[3].id, name="Álvaro Recoba", role=TutorRole.TECHNICAL, specialty="Ciberseguridad & DevSecOps", max_capacity=30, availability="Lunes y Viernes 09:00-12:00", status="Active", linkedin_url="https://www.linkedin.com/in/alvaro-recoba-ithaka"),
+            Tutor(user_id=tutor_users[4].id, name="Enzo Francescoli", role=TutorRole.BUSINESS, specialty="Estrategia Comercial B2B", max_capacity=45, availability="Miércoles y Jueves 15:00-19:00", status="Active", linkedin_url="https://www.linkedin.com/in/enzo-francescoli-ithaka"),
+            Tutor(user_id=tutor_users[5].id, name="Rubén Sosa", role=TutorRole.BUSINESS, specialty="Propiedad Intelectual", max_capacity=20, availability="Martes 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/ruben-sosa-ithaka"),
+            Tutor(user_id=tutor_users[6].id, name="Paolo Montero", role=TutorRole.TECHNICAL, specialty="Inteligencia Artificial & Datos", max_capacity=35, availability="Lunes 10:00-14:00", status="Active", linkedin_url="https://www.linkedin.com/in/paolo-montero-ithaka"),
+            Tutor(user_id=tutor_users[7].id, name="Gustavo Poyet", role=TutorRole.BUSINESS, specialty="Finanzas Corporativas & Pitch", max_capacity=50, availability="Jueves 10:00-16:00", status="Active", linkedin_url=None),
+            Tutor(name="José Nasazzi", role=TutorRole.TECHNICAL, specialty="Diseño UX/UI & Prototipado", max_capacity=40, availability="Miércoles 09:00-15:00", status="Active", linkedin_url=None),
+            Tutor(name="Héctor Scarone", role=TutorRole.BUSINESS, specialty="Desarrollo Internacional", max_capacity=25, availability="Viernes 14:00-18:00", status="Active", linkedin_url=None),
+            Tutor(name="Pedro Rocha", role=TutorRole.TECHNICAL, specialty="DevOps & Infraestructura", max_capacity=30, availability="Lunes 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/pedro-rocha"),
+            Tutor(name="Ladislao Mazurkiewicz", role=TutorRole.BUSINESS, specialty="Levantamiento de Capital", max_capacity=40, availability="Martes 10:00-14:00", status="Active", linkedin_url=None),
+            Tutor(name="Julio César Abbadie", role=TutorRole.BUSINESS, specialty="Growth Hacking & Analytics", max_capacity=35, availability="Jueves 14:00-18:00", status="Inactive", linkedin_url=None),
+            Tutor(name="Obdulio Varela", role=TutorRole.TECHNICAL, specialty="Blockchain & Smart Contracts", max_capacity=30, availability="Viernes 09:00-13:00", status="Inactive", linkedin_url=None),
+            Tutor(name="Schubert Gambetta", role=TutorRole.BUSINESS, specialty="Liderazgo & Gestión de Equipos", max_capacity=50, availability="Miércoles 10:00-16:00", status="Inactive", linkedin_url=None),
         ]
         db.add_all(tutors)
         db.flush()
         t_b1, t_t1, t_b2, t_t2, t_b3, t_b4, t_t3, t_b5 = tutors[0:8]
 
-        # 5. Crear Grupos (15 Grupos)
-        print("- Creando Grupos (15)...")
+        # 5. Crear Grupos (16 Grupos)
+        print("- Creando Grupos (16)...")
         groups = [
             Group(name="EcoRoute", cohort_id=cohort_active.id, current_stage_id=stage_2.id, idea="Plataforma de optimización de rutas de recolección de residuos.", major="Ingeniería en Informática", status="Active", business_tutor_id=t_b1.id, technical_tutor_id=t_t1.id),
             Group(name="HealthPulse", cohort_id=cohort_active.id, current_stage_id=stage_1.id, idea="Sistema de monitoreo remoto para pacientes mayores basado en IoT.", major="Ingeniería Biomédica", status="Active", business_tutor_id=t_b2.id, technical_tutor_id=t_t1.id),
@@ -164,29 +173,38 @@ def seed_database(force: bool = False):
             Group(name="RecyclePay", cohort_id=cohort_active.id, current_stage_id=stage_3.id, idea="Sistema de incentivos económicos por reciclar botellas.", major="Licenciatura en Negocios", status="Active", business_tutor_id=t_b1.id, technical_tutor_id=t_t3.id),
             Group(name="SafeDrive", cohort_id=cohorts[2].id, current_stage_id=stages[8].id, idea="Detección de fatiga en conductores mediante visión computacional.", major="Ingeniería en Informática", status="Inactive", business_tutor_id=t_b2.id, technical_tutor_id=t_t2.id),
             Group(name="CargoFly", cohort_id=cohorts[3].id, current_stage_id=stages[9].id, idea="Drones de entrega rápida de muestras biológicas entre hospitales.", major="Ingeniería Biomédica", status="Inactive", business_tutor_id=t_b4.id, technical_tutor_id=t_t3.id),
+            # Grupo de demo: sin tutores asignados a proposito, para el flujo de demo (asignar tutor en el detalle del grupo).
+            Group(name="PitchReady", cohort_id=cohort_active.id, current_stage_id=stage_1.id, idea="Grupo de demostración para el flujo de asignación de tutores y reuniones.", major="Ingeniería en Informática", status="Active", business_tutor_id=None, technical_tutor_id=None),
         ]
         db.add_all(groups)
         db.flush()
+        demo_group = groups[15]
 
-        # 6. Crear Estudiantes (16 Estudiantes)
-        print("- Creando Estudiantes (16)...")
+        # 6. Crear Estudiantes (20 Estudiantes)
+        print("- Creando Estudiantes (20)...")
         students = [
-            Student(user_id=student_users[0].id, name="Ana Fernández", email="ana.fernandez@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[0].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/ana-fernandez"),
-            Student(user_id=student_users[1].id, name="Luca Rossi", email="luca.rossi@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[0].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/luca-rossi"),
-            Student(user_id=student_users[2].id, name="Mateo Silva", email="mateo.silva@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[1].id, is_graduation_project=True, linkedin_url=None),
-            Student(user_id=student_users[3].id, name="Camila Torres", email="camila.torres@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=groups[1].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/camila-torres"),
-            Student(user_id=student_users[4].id, name="Joaquín Olivera", email="joaquin.olivera@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=groups[2].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/joaquin-olivera"),
-            Student(user_id=student_users[5].id, name="Valentina Morales", email="valentina.morales@correo.ucu.edu.uy", major="Licenciatura en Educación", group_id=groups[3].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/valentina-morales"),
-            Student(user_id=student_users[6].id, name="Gabriel Méndez", email="gabriel.mendez@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[4].id, is_graduation_project=False, linkedin_url=None),
-            Student(user_id=student_users[7].id, name="Isabella Castro", email="isabella.castro@correo.ucu.edu.uy", major="Ingeniería Eléctrica", group_id=groups[5].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/isabella-castro"),
-            Student(user_id=student_users[8].id, name="Rodrigo Bentancur", email="rodrigo.bentancur@correo.ucu.edu.uy", major="Ingeniería Química", group_id=groups[6].id, is_graduation_project=False, linkedin_url=None),
-            Student(user_id=student_users[9].id, name="Martina Domínguez", email="martina.dominguez@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[9].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/martina-dominguez"),
-            Student(user_id=student_users[10].id, name="Nicolás Acosta", email="nicolas.acosta@correo.ucu.edu.uy", major="Licenciatura en Nutrición", group_id=groups[10].id, is_graduation_project=True, linkedin_url=None),
-            Student(user_id=student_users[11].id, name="Sofía Cabrera", email="sofia.cabrera@correo.ucu.edu.uy", major="Ingeniería Química", group_id=groups[11].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/sofia-cabrera"),
-            Student(user_id=student_users[12].id, name="Tomás Roldán", email="tomas.roldan@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[12].id, is_graduation_project=True, linkedin_url=None),
-            Student(user_id=student_users[13].id, name="Florencia Paz", email="florencia.paz@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[13].id, is_graduation_project=False, linkedin_url=None),
-            Student(user_id=student_users[14].id, name="Agustín Benítez", email="agustin.benitez@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=groups[14].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/agustin-benitez"),
-            Student(user_id=student_users[15].id, name="Luciana Vega", email="luciana.vega@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=groups[7].id, is_graduation_project=False, linkedin_url=None),
+            Student(user_id=student_users[0].id, name="Federico Valverde", email="federico.valverde@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[0].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/federico-valverde"),
+            Student(user_id=student_users[1].id, name="Rodrigo Bentancur", email="rodrigo.bentancur@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[0].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/rodrigo-bentancur"),
+            Student(user_id=student_users[2].id, name="Ronald Araújo", email="ronald.araujo@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[1].id, is_graduation_project=True, linkedin_url=None),
+            Student(user_id=student_users[3].id, name="Darwin Núñez", email="darwin.nunez@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=groups[1].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/darwin-nunez"),
+            Student(user_id=student_users[4].id, name="Facundo Pellistri", email="facundo.pellistri@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=groups[2].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/facundo-pellistri"),
+            Student(user_id=student_users[5].id, name="Manuel Ugarte", email="manuel.ugarte@correo.ucu.edu.uy", major="Licenciatura en Educación", group_id=groups[3].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/manuel-ugarte"),
+            Student(user_id=student_users[6].id, name="Giorgian De Arrascaeta", email="giorgian.dearrascaeta@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[4].id, is_graduation_project=False, linkedin_url=None),
+            Student(user_id=student_users[7].id, name="Nahitan Nández", email="nahitan.nandez@correo.ucu.edu.uy", major="Ingeniería Eléctrica", group_id=groups[5].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/nahitan-nandez"),
+            Student(user_id=student_users[8].id, name="Matías Vecino", email="matias.vecino@correo.ucu.edu.uy", major="Ingeniería Química", group_id=groups[6].id, is_graduation_project=False, linkedin_url=None),
+            Student(user_id=student_users[9].id, name="Nicolás de la Cruz", email="nicolas.delacruz@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[9].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/nicolas-de-la-cruz"),
+            Student(user_id=student_users[10].id, name="Mathías Olivera", email="mathias.olivera@correo.ucu.edu.uy", major="Licenciatura en Nutrición", group_id=groups[10].id, is_graduation_project=True, linkedin_url=None),
+            Student(user_id=student_users[11].id, name="Guillermo Varela", email="guillermo.varela@correo.ucu.edu.uy", major="Ingeniería Química", group_id=groups[11].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/guillermo-varela"),
+            Student(user_id=student_users[12].id, name="Maximiliano Araújo", email="maximiliano.araujo@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[12].id, is_graduation_project=True, linkedin_url=None),
+            Student(user_id=student_users[13].id, name="Agustín Canobbio", email="agustin.canobbio@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[13].id, is_graduation_project=False, linkedin_url=None),
+            Student(user_id=student_users[14].id, name="Brian Rodríguez", email="brian.rodriguez@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=groups[14].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/brian-rodriguez"),
+            Student(user_id=student_users[15].id, name="Facundo Torres", email="facundo.torres@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=groups[7].id, is_graduation_project=False, linkedin_url=None),
+            # Estudiante de demo, en el grupo sin tutor (PitchReady).
+            Student(user_id=demo_student_user.id, name="Sergio Rochet", email="demo.estudiante@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=demo_group.id, is_graduation_project=False, linkedin_url=None),
+            # Estudiantes sin grupo asignado.
+            Student(user_id=unassigned_student_users[0].id, name="Santiago Bueno", email="santiago.bueno@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=None, is_graduation_project=False, linkedin_url=None),
+            Student(user_id=unassigned_student_users[1].id, name="Sebastián Cáceres", email="sebastian.caceres@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=None, is_graduation_project=False, linkedin_url=None),
+            Student(user_id=unassigned_student_users[2].id, name="Facundo González", email="facundo.gonzalez@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=None, is_graduation_project=False, linkedin_url=None),
         ]
         db.add_all(students)
         db.flush()
