@@ -5,8 +5,8 @@ from app.core.db.session import get_db
 from app.core.models.enums import UserRole
 from app.core.models.user import User
 from app.core.repositories.user_repository import UserRepository
-from app.core.schemas.user import UserCreate, UserRead, UserUpdate, PaginatedUserResponse
-from app.core.security import get_current_user, require_roles
+from app.core.schemas.user import UserCreate, UserRead, UserUpdate, UserSelfUpdate, PasswordChangeRequest, PaginatedUserResponse
+from app.core.security import get_current_user, require_roles, hash_password, verify_password
 from app.core.services.auth_service import AuthService
 
 router = APIRouter(prefix="/api/users", tags=["Users"])
@@ -18,6 +18,38 @@ def read_current_user(
 ) -> User:
     """Devuelve el perfil del usuario autenticado."""
     return current_user
+
+
+@router.put("/me", response_model=UserRead)
+def update_current_user(
+    data: UserSelfUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> User:
+    """Actualiza nombre/email del propio usuario autenticado."""
+    repo = UserRepository(db)
+    existing_user = repo.get_by_email(data.email)
+    if existing_user is not None and existing_user.id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A user with this email already exists",
+        )
+    return repo.update(current_user, name=data.name, email=data.email, role=current_user.role)
+
+
+@router.put("/me/password", status_code=status.HTTP_204_NO_CONTENT)
+def update_current_user_password(
+    data: PasswordChangeRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> None:
+    """Cambia la contraseña del propio usuario autenticado."""
+    if not verify_password(data.current_password, current_user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La contraseña actual no es correcta",
+        )
+    UserRepository(db).update_password(current_user, password_hash=hash_password(data.new_password))
 
 
 @router.get("", response_model=PaginatedUserResponse)

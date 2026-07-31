@@ -55,7 +55,7 @@ def upsert_material(
     return service.upsert_material(db, payload)
 
 
-@router.delete("/{material_id}", status_code=204, dependencies=[Depends(require_coordinator)])
+@router.delete("/{material_id}", status_code=204, dependencies=[Depends(require_tutor_or_coordinator)])
 def delete_material(
     material_id: int,
     db: Session = Depends(get_db),

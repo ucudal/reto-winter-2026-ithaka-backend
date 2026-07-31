@@ -35,7 +35,14 @@ class CohortService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Semester must be 1 or 2",
             )
-        
+
+        existing = self.repository.get_by_year_semester(db, payload.year, payload.semester)
+        if existing is not None and existing.id != payload.id:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Ya existe un cohorte para ese año y semestre",
+            )
+
         if payload.id is None:
             cohort = self.repository.create(db, payload)
         else:
