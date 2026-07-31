@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session, joinedload
 
 from app.core.models.enums import UserRole
@@ -35,19 +35,28 @@ class UserRepository:
         )
         return self.db.execute(stmt).scalar_one_or_none()
 
-    def list_all(self, *, role: UserRole | None = None, name_search: str | None = None, page: int = 1, page_size: int = 10) -> list[User]:
-        stmt = select(User)
+    def list_all(self, *, role: UserRole | None = None, name_search: str | None = None, page: int = 1, page_size: int = 10) -> tuple[list[User], int]:
+        # Get total count
+        count_stmt = select(func.count(User.id))
+        if role is not None:
+            count_stmt = count_stmt.where(User.role == role)
+        if name_search is not None:
+            count_stmt = count_stmt.where(User.name.ilike(f"%{name_search}%"))
+        total = self.db.execute(count_stmt).scalar() or 0
         
+        # Get paginated items
+        stmt = select(User)
         if role is not None:
             stmt = stmt.where(User.role == role)
-        
         if name_search is not None:
             stmt = stmt.where(User.name.ilike(f"%{name_search}%"))
         
         stmt = stmt.order_by(User.id)
         offset = (page - 1) * page_size
         stmt = stmt.offset(offset).limit(page_size)
-        return list(self.db.execute(stmt).scalars().all())
+        items = list(self.db.execute(stmt).scalars().all())
+        
+        return items, total
 
     def create(
         self,
@@ -72,6 +81,12 @@ class UserRepository:
         user.name = name
         user.email = email
         user.role = role
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def update_password(self, user: User, *, password_hash: str) -> User:
+        user.password_hash = password_hash
         self.db.commit()
         self.db.refresh(user)
         return user

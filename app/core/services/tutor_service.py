@@ -26,9 +26,9 @@ class TutorService:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> list[TutorRead]:
+    ) -> tuple[list[TutorRead], int]:
 
-        tutors = self.repo.list(
+        tutors, total = self.repo.list(
             db,
             role=role,
             status=status,
@@ -37,7 +37,8 @@ class TutorService:
             page_size=page_size,
         )
 
-        return [self._to_read(tutor) for tutor in tutors]
+        items = [self._to_read(tutor) for tutor in tutors]
+        return items, total
 
     def get_tutor(self, db: Session, tutor_id: int) -> Tutor:
         tutor = self.repo.get_by_id(db, tutor_id)

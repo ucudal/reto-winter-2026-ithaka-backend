@@ -21,11 +21,12 @@ class SupportMaterialService:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> list[SupportMaterialRead]:
-        materials = self.repository.list(
+    ) -> tuple[list[SupportMaterialRead], int]:
+        materials, total = self.repository.list(
             db, stage_id=stage_id, search=search, page=page, page_size=page_size
         )
-        return [self._to_read(material) for material in materials]
+        items = [self._to_read(material) for material in materials]
+        return items, total
 
     def get_material(self, db: Session, material_id: int) -> SupportMaterialRead:
         material = self._get_or_404(db, material_id)

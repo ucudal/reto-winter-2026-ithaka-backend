@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 from app.core.models.student import Student
 from app.core.schemas.student import StudentUpsert
@@ -14,23 +14,26 @@ class StudentRepository:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> list[Student]:
-        statement = select(Student)
+    ) -> tuple[list[Student], int]:
+        count_stmt = select(func.count(Student.id))
+        if group_id is not None:
+            count_stmt = count_stmt.where(Student.group_id == group_id)
+        if search is not None:
+            count_stmt = count_stmt.where(Student.name.ilike(f"%{search}%"))
+        total = self.db.execute(count_stmt).scalar() or 0
 
+        statement = select(Student)
         if group_id is not None:
             statement = statement.where(Student.group_id == group_id)
-
         if search is not None:
-            statement = statement.where(
-                Student.name.ilike(f"%{search}%")
-            )
+            statement = statement.where(Student.name.ilike(f"%{search}%"))
 
         statement = statement.order_by(Student.name.asc(), Student.id.asc())
-
         offset = (page - 1) * page_size
         statement = statement.offset(offset).limit(page_size)
 
-        return list(self.db.scalars(statement).all())
+        items = list(self.db.scalars(statement).all())
+        return items, total
 
     def get_by_id(self, student_id: int) -> Student | None:
         return self.db.get(Student, student_id)

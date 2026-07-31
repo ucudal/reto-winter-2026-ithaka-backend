@@ -11,27 +11,39 @@ from app.core.schemas.cohort import CohortUpsertRequest
 
 class CohortRepository:
 
-    def list(self, db: Session, year: int | None = None, semester: int | None = None, status: str | None = None, page: int = 1, page_size: int = 10) -> list[Cohort]:
+    def list(self, db: Session, year: int | None = None, semester: int | None = None, status: str | None = None, page: int = 1, page_size: int = 10) -> tuple[list[Cohort], int]:
+        count_stmt = select(func.count(Cohort.id))
+        if year is not None:
+            count_stmt = count_stmt.where(Cohort.year == year)
+        if semester is not None:
+            count_stmt = count_stmt.where(Cohort.semester == semester)
+        if status is not None:
+            count_stmt = count_stmt.where(Cohort.status == status)
+        total = db.execute(count_stmt).scalar() or 0
+
         statement = select(Cohort)
-        
         if year is not None:
             statement = statement.where(Cohort.year == year)
         if semester is not None:
             statement = statement.where(Cohort.semester == semester)
         if status is not None:
             statement = statement.where(Cohort.status == status)
-        
+
         statement = statement.order_by(
             Cohort.year.desc(), Cohort.semester.desc(), Cohort.id.desc()
         )
-        
         offset = (page - 1) * page_size
         statement = statement.offset(offset).limit(page_size)
-        
-        return list(db.scalars(statement).all())
+
+        items = list(db.scalars(statement).all())
+        return items, total
 
     def get_by_id(self, db: Session, cohort_id: int) -> Cohort | None:
         return db.get(Cohort, cohort_id)
+
+    def get_by_year_semester(self, db: Session, year: int, semester: int) -> Cohort | None:
+        statement = select(Cohort).where(Cohort.year == year, Cohort.semester == semester)
+        return db.scalars(statement).first()
 
     def create(self, db: Session, payload: CohortUpsertRequest) -> Cohort:
         cohort = Cohort(**payload.model_dump(exclude={"id"}))

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.core.models.enums import TutorRole
@@ -20,9 +20,17 @@ class TutorRepository:
         search: str | None = None,
         page: int = 1,
         page_size: int = 10,
-    ) -> list[Tutor]:
-        statement = select(Tutor)
+    ) -> tuple[list[Tutor], int]:
+        count_stmt = select(func.count(Tutor.id))
+        if role is not None:
+            count_stmt = count_stmt.where(Tutor.role == role)
+        if status is not None:
+            count_stmt = count_stmt.where(Tutor.status == status)
+        if search:
+            count_stmt = count_stmt.where(Tutor.name.ilike(f"%{search}%"))
+        total = db.execute(count_stmt).scalar() or 0
 
+        statement = select(Tutor)
         if role is not None:
             statement = statement.where(Tutor.role == role)
         if status is not None:
@@ -31,11 +39,11 @@ class TutorRepository:
             statement = statement.where(Tutor.name.ilike(f"%{search}%"))
 
         statement = statement.order_by(Tutor.name.asc())
-
         offset = (page - 1) * page_size
         statement = statement.offset(offset).limit(page_size)
 
-        return list(db.scalars(statement).all())
+        items = list(db.scalars(statement).all())
+        return items, total
 
     def list_all(self, db: Session) -> list[Tutor]:
         """Trae todos los tutores sin paginar. Uso interno (p. ej. list_overloaded)."""
