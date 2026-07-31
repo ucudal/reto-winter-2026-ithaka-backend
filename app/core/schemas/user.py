@@ -21,6 +21,16 @@ class UserUpdate(UserBase):
     pass
 
 
+class UserSelfUpdate(BaseModel):
+    name: str = Field(min_length=1, max_length=120)
+    email: EmailStr
+
+
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str = Field(min_length=8, max_length=128)
+
+
 class UserRead(UserBase):
     id: int
     student: StudentRead | None = None
