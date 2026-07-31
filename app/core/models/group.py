@@ -37,7 +37,7 @@ class Group(Base):
         back_populates="groups_as_technical_tutor",
     )
     students: Mapped[list["Student"]] = relationship(
-        back_populates="group", cascade="all, delete-orphan"
+        back_populates="group"
     )
     meetings: Mapped[list["Meeting"]] = relationship(
         back_populates="group", cascade="all, delete-orphan"

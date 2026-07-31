@@ -20,6 +20,7 @@ class TutorRead(BaseModel):
 
 class TutorUpsertRequest(BaseModel):
     id: int | None = None
+    user_id: int | None = None
     name: str
     role: TutorRole
     specialty: str | None = None

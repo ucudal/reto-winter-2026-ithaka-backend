@@ -41,6 +41,10 @@ class CohortRepository:
     def get_by_id(self, db: Session, cohort_id: int) -> Cohort | None:
         return db.get(Cohort, cohort_id)
 
+    def get_by_year_semester(self, db: Session, year: int, semester: int) -> Cohort | None:
+        statement = select(Cohort).where(Cohort.year == year, Cohort.semester == semester)
+        return db.scalars(statement).first()
+
     def create(self, db: Session, payload: CohortUpsertRequest) -> Cohort:
         cohort = Cohort(**payload.model_dump(exclude={"id"}))
         db.add(cohort)
