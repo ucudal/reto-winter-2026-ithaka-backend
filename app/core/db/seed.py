@@ -39,9 +39,9 @@ def seed_database(force: bool = False):
 
         default_pwd_hash = hash_password("password")
 
-        # 1. Crear Usuarios (29 Usuarios: 1 Coord (DT), 8 Tutores, 20 Estudiantes)
+        # 1. Crear Usuarios (27 Usuarios: 1 Coord (DT), 8 Tutores, 18 Estudiantes)
         # Nombres tomados del plantel/DT de la Selección Uruguaya de fútbol.
-        print("- Creando Usuarios (29)...")
+        print("- Creando Usuarios (27)...")
         users = [
             User(name="Marcelo Bielsa", email="marcelo.bielsa@ithaka.ucu.edu.uy", role=UserRole.COORDINATOR, password_hash=default_pwd_hash),
             # Tutores
@@ -72,10 +72,9 @@ def seed_database(force: bool = False):
             User(name="Facundo Torres", email="facundo.torres@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
             # Estudiante de demo: usado en el flujo de demo (grupo sin tutor -> asignar tutor -> crear reunion -> ver reunion como estudiante)
             User(name="Sergio Rochet", email="demo.estudiante@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            # Estudiantes sin grupo asignado (para probar el flujo de asignación de alumnos a un grupo nuevo)
-            User(name="Santiago Bueno", email="santiago.bueno@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Sebastián Cáceres", email="sebastian.caceres@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
-            User(name="Facundo González", email="facundo.gonzalez@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
+            # Estudiante sin grupo asignado (para probar el flujo de asignación de alumnos a un grupo nuevo).
+            # Homónimo del tutor Fernando Muslera: cuenta de estudiante distinta, mismo nombre.
+            User(name="Fernando Muslera", email="fernando.muslera@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
         ]
         db.add_all(users)
         db.flush()
@@ -84,7 +83,7 @@ def seed_database(force: bool = False):
         tutor_users = users[1:9]
         student_users = users[9:25]
         demo_student_user = users[25]
-        unassigned_student_users = users[26:29]
+        unassigned_student_user = users[26]
 
         # 2. Crear Cohortes (15 Cohortes)
         print("- Creando Cohortes (15)...")
@@ -180,13 +179,15 @@ def seed_database(force: bool = False):
         db.flush()
         demo_group = groups[15]
 
-        # 6. Crear Estudiantes (20 Estudiantes)
-        print("- Creando Estudiantes (20)...")
+        # 6. Crear Estudiantes (18 Estudiantes)
+        print("- Creando Estudiantes (18)...")
         students = [
-            Student(user_id=student_users[0].id, name="Federico Valverde", email="federico.valverde@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[0].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/federico-valverde"),
+            # Sin grupo asignado a proposito (para probar el selector de alumnos al crear/editar un grupo).
+            Student(user_id=student_users[0].id, name="Federico Valverde", email="federico.valverde@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=None, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/federico-valverde"),
             Student(user_id=student_users[1].id, name="Rodrigo Bentancur", email="rodrigo.bentancur@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=groups[0].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/rodrigo-bentancur"),
             Student(user_id=student_users[2].id, name="Ronald Araújo", email="ronald.araujo@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[1].id, is_graduation_project=True, linkedin_url=None),
-            Student(user_id=student_users[3].id, name="Darwin Núñez", email="darwin.nunez@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=groups[1].id, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/darwin-nunez"),
+            # Sin grupo asignado a proposito.
+            Student(user_id=student_users[3].id, name="Darwin Núñez", email="darwin.nunez@correo.ucu.edu.uy", major="Ingeniería Biomédica", group_id=None, is_graduation_project=False, linkedin_url="https://www.linkedin.com/in/darwin-nunez"),
             Student(user_id=student_users[4].id, name="Facundo Pellistri", email="facundo.pellistri@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=groups[2].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/facundo-pellistri"),
             Student(user_id=student_users[5].id, name="Manuel Ugarte", email="manuel.ugarte@correo.ucu.edu.uy", major="Licenciatura en Educación", group_id=groups[3].id, is_graduation_project=True, linkedin_url="https://www.linkedin.com/in/manuel-ugarte"),
             Student(user_id=student_users[6].id, name="Giorgian De Arrascaeta", email="giorgian.dearrascaeta@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=groups[4].id, is_graduation_project=False, linkedin_url=None),
@@ -201,10 +202,8 @@ def seed_database(force: bool = False):
             Student(user_id=student_users[15].id, name="Facundo Torres", email="facundo.torres@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=groups[7].id, is_graduation_project=False, linkedin_url=None),
             # Estudiante de demo, en el grupo sin tutor (PitchReady).
             Student(user_id=demo_student_user.id, name="Sergio Rochet", email="demo.estudiante@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=demo_group.id, is_graduation_project=False, linkedin_url=None),
-            # Estudiantes sin grupo asignado.
-            Student(user_id=unassigned_student_users[0].id, name="Santiago Bueno", email="santiago.bueno@correo.ucu.edu.uy", major="Ingeniería en Informática", group_id=None, is_graduation_project=False, linkedin_url=None),
-            Student(user_id=unassigned_student_users[1].id, name="Sebastián Cáceres", email="sebastian.caceres@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=None, is_graduation_project=False, linkedin_url=None),
-            Student(user_id=unassigned_student_users[2].id, name="Facundo González", email="facundo.gonzalez@correo.ucu.edu.uy", major="Licenciatura en Negocios", group_id=None, is_graduation_project=False, linkedin_url=None),
+            # Sin grupo asignado a proposito.
+            Student(user_id=unassigned_student_user.id, name="Fernando Muslera", email="fernando.muslera@correo.ucu.edu.uy", major="Ingeniería Industrial", group_id=None, is_graduation_project=False, linkedin_url=None),
         ]
         db.add_all(students)
         db.flush()
