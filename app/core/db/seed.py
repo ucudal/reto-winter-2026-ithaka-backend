@@ -46,7 +46,7 @@ def seed_database(force: bool = False):
             User(name="Marcelo Bielsa", email="marcelo.bielsa@ithaka.ucu.edu.uy", role=UserRole.COORDINATOR, password_hash=default_pwd_hash),
             # Tutores
             User(name="Diego Godín", email="diego.godin@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
-            User(name="Fernando Muslera", email="fernando.muslera@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
+            User(name="Sebastián Abreu", email="sebastian.abreu@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
             User(name="Diego Forlán", email="diego.forlan@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
             User(name="Álvaro Recoba", email="alvaro.recoba@ithaka.ucu.edu.uy", role=UserRole.TECHNICAL_TUTOR, password_hash=default_pwd_hash),
             User(name="Enzo Francescoli", email="enzo.francescoli@ithaka.ucu.edu.uy", role=UserRole.BUSINESS_TUTOR, password_hash=default_pwd_hash),
@@ -73,7 +73,6 @@ def seed_database(force: bool = False):
             # Estudiante de demo: usado en el flujo de demo (grupo sin tutor -> asignar tutor -> crear reunion -> ver reunion como estudiante)
             User(name="Sergio Rochet", email="demo.estudiante@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
             # Estudiante sin grupo asignado (para probar el flujo de asignación de alumnos a un grupo nuevo).
-            # Homónimo del tutor Fernando Muslera: cuenta de estudiante distinta, mismo nombre.
             User(name="Fernando Muslera", email="fernando.muslera@correo.ucu.edu.uy", role=UserRole.STUDENT, password_hash=default_pwd_hash),
         ]
         db.add_all(users)
@@ -135,7 +134,7 @@ def seed_database(force: bool = False):
         print("- Creando Tutores (15)...")
         tutors = [
             Tutor(user_id=tutor_users[0].id, name="Diego Godín", role=TutorRole.BUSINESS, specialty="Modelos SaaS & Finanzas", max_capacity=60, availability="Lunes y Miércoles 14:00-18:00", status="Active", linkedin_url="https://www.linkedin.com/in/diego-godin-ithaka"),
-            Tutor(user_id=tutor_users[1].id, name="Fernando Muslera", role=TutorRole.TECHNICAL, specialty="Arquitectura Cloud & Mobile", max_capacity=40, availability="Martes y Jueves 09:00-13:00", status="Active", linkedin_url="https://www.linkedin.com/in/fernando-muslera-ithaka"),
+            Tutor(user_id=tutor_users[1].id, name="Sebastián Abreu", role=TutorRole.TECHNICAL, specialty="Arquitectura Cloud & Mobile", max_capacity=40, availability="Martes y Jueves 09:00-13:00", status="Active", linkedin_url="https://www.linkedin.com/in/sebastian-abreu-ithaka"),
             Tutor(user_id=tutor_users[2].id, name="Diego Forlán", role=TutorRole.BUSINESS, specialty="Marketing & Validación", max_capacity=50, availability="Viernes 10:00-16:00", status="Active", linkedin_url="https://www.linkedin.com/in/diego-forlan-ithaka"),
             Tutor(user_id=tutor_users[3].id, name="Álvaro Recoba", role=TutorRole.TECHNICAL, specialty="Ciberseguridad & DevSecOps", max_capacity=30, availability="Lunes y Viernes 09:00-12:00", status="Active", linkedin_url="https://www.linkedin.com/in/alvaro-recoba-ithaka"),
             Tutor(user_id=tutor_users[4].id, name="Enzo Francescoli", role=TutorRole.BUSINESS, specialty="Estrategia Comercial B2B", max_capacity=45, availability="Miércoles y Jueves 15:00-19:00", status="Active", linkedin_url="https://www.linkedin.com/in/enzo-francescoli-ithaka"),
