@@ -21,4 +21,7 @@ class Student(Base):
     linkedin_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user: Mapped["User | None"] = relationship(back_populates="student")
+    memberships: Mapped[list["StudentGroupMembership"]] = relationship(
+        back_populates="student", cascade="all, delete-orphan"
+    )
     group: Mapped["Group | None"] = relationship(back_populates="students")

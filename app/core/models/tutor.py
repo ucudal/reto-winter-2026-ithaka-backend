@@ -24,6 +24,9 @@ class Tutor(Base):
     linkedin_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user: Mapped["User | None"] = relationship(back_populates="tutor")
+    assignments: Mapped[list["TutorGroupAssignment"]] = relationship(
+        back_populates="tutor", cascade="all, delete-orphan"
+    )
     groups_as_business_tutor: Mapped[list["Group"]] = relationship(
         foreign_keys="Group.business_tutor_id",
         back_populates="business_tutor",

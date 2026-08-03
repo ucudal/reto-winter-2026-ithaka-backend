@@ -9,8 +9,10 @@ from app.core.models.group import Group
 from app.core.models.meeting import Meeting
 from app.core.models.stage import Stage
 from app.core.models.student import Student
+from app.core.models.student_group_membership import StudentGroupMembership
 from app.core.models.support_material import SupportMaterial
 from app.core.models.tutor import Tutor
+from app.core.models.tutor_group_assignment import TutorGroupAssignment
 from app.core.models.user import User
 from app.core.models.checkpoint import Checkpoint
 
@@ -24,8 +26,10 @@ __all__ = [
     "Meeting",
     "Stage",
     "Student",
+    "StudentGroupMembership",
     "SupportMaterial",
     "Tutor",
+    "TutorGroupAssignment",
     "User",
     "Checkpoint",
 ]
